@@ -1236,30 +1236,87 @@
 
                 console.log('Raw submissions from database:', submissions);
 
-                // Get related data separately to avoid complex joins
-                const [driversData, clientsData, branchesData, mediaData] = await Promise.all([
-                    supabase.from('drivers').select('*'),
-                    supabase.from('clients').select('*'),
-                    supabase.from('branches').select('*'),
-                    supabase.from('media_files').select('*')
-                ]);
+                if (!submissions || submissions.length === 0) {
+                    console.log('No submissions found in database');
+                    submissionsData = [];
+                    loadSubmissionsTable();
+                    showNotification('No submissions found in database', 'info');
+                    return;
+                }
 
-                // Create lookup maps
-                const driversMap = new Map((driversData.data || []).map(d => [d.id, d]));
-                const clientsMap = new Map((clientsData.data || []).map(c => [c.id, c]));
-                const branchesMap = new Map((branchesData.data || []).map(b => [b.id, b]));
+                // Get related data separately with individual error handling
+                let driversData = [];
+                let clientsData = [];
+                let branchesData = [];
+                let mediaData = [];
+
+                try {
+                    const driversResult = await supabase.from('drivers').select('*');
+                    driversData = driversResult.data || [];
+                    if (driversResult.error) console.error('Drivers query error:', driversResult.error);
+                } catch (e) {
+                    console.error('Failed to load drivers:', e);
+                }
+
+                try {
+                    const clientsResult = await supabase.from('clients').select('*');
+                    clientsData = clientsResult.data || [];
+                    if (clientsResult.error) console.error('Clients query error:', clientsResult.error);
+                } catch (e) {
+                    console.error('Failed to load clients:', e);
+                }
+
+                try {
+                    const branchesResult = await supabase.from('branches').select('*');
+                    branchesData = branchesResult.data || [];
+                    if (branchesResult.error) console.error('Branches query error:', branchesResult.error);
+                } catch (e) {
+                    console.error('Failed to load branches:', e);
+                }
+
+                try {
+                    const mediaResult = await supabase.from('media_files').select('*');
+                    mediaData = mediaResult.data || [];
+                    if (mediaResult.error) console.error('Media query error:', mediaResult.error);
+                } catch (e) {
+                    console.error('Failed to load media files:', e);
+                }
+
+                console.log('Loaded related data:', {
+                    drivers: driversData.length,
+                    clients: clientsData.length,
+                    branches: branchesData.length,
+                    media: mediaData.length
+                });
+
+                // Create lookup maps safely
+                const driversMap = new Map();
+                driversData.forEach(d => d && d.id && driversMap.set(d.id, d));
+                
+                const clientsMap = new Map();
+                clientsData.forEach(c => c && c.id && clientsMap.set(c.id, c));
+                
+                const branchesMap = new Map();
+                branchesData.forEach(b => b && b.id && branchesMap.set(b.id, b));
                 
                 // Group media files by submission
                 const mediaBySubmission = {};
-                (mediaData.data || []).forEach(media => {
-                    if (!mediaBySubmission[media.submission_id]) {
-                        mediaBySubmission[media.submission_id] = [];
+                mediaData.forEach(media => {
+                    if (media && media.submission_id) {
+                        if (!mediaBySubmission[media.submission_id]) {
+                            mediaBySubmission[media.submission_id] = [];
+                        }
+                        mediaBySubmission[media.submission_id].push(media);
                     }
-                    mediaBySubmission[media.submission_id].push(media);
                 });
 
                 // Map submissions with related data
                 submissionsData = submissions.map(item => {
+                    if (!item || !item.id) {
+                        console.warn('Invalid submission item:', item);
+                        return null;
+                    }
+
                     const driver = driversMap.get(item.driver_id) || {};
                     const client = clientsMap.get(item.client_id) || {};
                     const branch = branchesMap.get(item.branch_id) || {};
@@ -1275,20 +1332,20 @@
                         branch: branch.name || '',
                         submitted: new Date(item.submitted_at).toLocaleString(),
                         lastModified: new Date(item.updated_at).toLocaleString(),
-                        status: item.status,
-                        priority: item.priority,
+                        status: item.status || 'pending',
+                        priority: item.priority || 'medium',
                         mediaCount: mediaFiles.length,
                         mediaTypes: [...new Set(mediaFiles.map(f => f.file_type))].join(', ') || 'None',
                         mediaSize: formatFileSize(mediaFiles.reduce((sum, f) => sum + (f.file_size || 0), 0)),
-                        instructions: item.instructions,
-                        instructionType: item.instruction_types,
-                        frequency: item.delivery_frequency,
-                        challenges: item.challenges,
-                        reviewedBy: item.reviewed_by,
-                        reviewNotes: item.review_notes,
+                        instructions: item.instructions || '',
+                        instructionType: item.instruction_types || '',
+                        frequency: item.delivery_frequency || '',
+                        challenges: item.challenges || '',
+                        reviewedBy: item.reviewed_by || null,
+                        reviewNotes: item.review_notes || null,
                         media_files: mediaFiles
                     };
-                });
+                }).filter(Boolean); // Remove any null items
 
                 console.log('Processed submissions data:', submissionsData);
 
@@ -1297,7 +1354,12 @@
                 
             } catch (error) {
                 console.error('Error loading submissions:', error);
-                console.error('Error details:', error.message, error.details, error.hint);
+                console.error('Error details:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
                 showNotification(`Database error: ${error.message}. Using sample data.`, 'error');
                 
                 // Fallback to sample data if database fails
