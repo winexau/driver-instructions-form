@@ -597,6 +597,12 @@
         </div>
         
         <div class="form-section">
+            <!-- Browser Compatibility Warning -->
+            <div id="browserWarning" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #856404;">
+                <strong>⚠️ Browser Compatibility Notice</strong>
+                <div id="browserWarningText" style="margin-top: 8px; font-size: 14px;"></div>
+            </div>
+            
             <div class="step-indicator">
                 <div class="step-dot active"></div>
                 <div class="step-dot"></div>
@@ -704,18 +710,18 @@ Examples:
                             🎥
                             <span>Record Video</span>
                         </button>
+                        <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                            🖼️
+                            <span>Camera Roll</span>
+                        </button>
                         <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                             📄
                             <span>Upload Document</span>
                         </button>
-                        <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
-                            🖼️
-                            <span>Choose Images</span>
-                        </button>
                     </div>
                     
                     <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx,.txt" multiple onchange="handleFileUpload(this.files)">
-                    <input type="file" id="imageInput" class="file-input" accept="image/*" multiple onchange="handleImageUpload(this.files)">
+                    <input type="file" id="imageInput" class="file-input" accept="image/*,video/*" multiple capture="environment" onchange="handleImageUpload(this.files)">
                 </div>
                 
                 <!-- Camera Interface -->
@@ -744,6 +750,8 @@ Examples:
                         • <strong>Photos:</strong> Show gate keypads, entrance signs, loading docks<br>
                         • <strong>Videos:</strong> Record complex access procedures or safety protocols<br>
                         • <strong>Documents:</strong> Attach site maps, contact lists, or special forms<br>
+                        • <strong>Camera Issues:</strong> If camera doesn't work, use "Camera Roll" button instead<br>
+                        • <strong>Brave Browser:</strong> Tap shield icon in address bar → enable camera access<br>
                         • <strong>Quality:</strong> Ensure good lighting and clear visibility
                     </div>
                 </div>
@@ -980,13 +988,15 @@ Examples:
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const isVideo = file.type.startsWith('video/');
                     const mediaItem = {
                         id: ++mediaCounter,
-                        type: 'image',
+                        type: isVideo ? 'video' : 'image',
                         name: file.name,
                         size: file.size,
                         url: e.target.result,
-                        description: 'Uploaded image'
+                        description: isVideo ? 'Uploaded video' : 'Uploaded image',
+                        duration: isVideo ? 'Unknown' : undefined
                     };
                     
                     uploadedMedia.push(mediaItem);
@@ -1234,9 +1244,46 @@ Examples:
         
         // Check for camera support on load
         window.addEventListener('load', () => {
+            // Browser detection
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isBrave = navigator.brave && navigator.brave.isBrave;
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const isChrome = /chrome/i.test(navigator.userAgent) && !/edg/i.test(navigator.userAgent);
+            
+            const browserWarning = document.getElementById('browserWarning');
+            const browserWarningText = document.getElementById('browserWarningText');
+            
+            // Show warnings for problematic browser combinations
+            if (isBrave && isIOS) {
+                browserWarning.style.display = 'block';
+                browserWarningText.innerHTML = `
+                    You're using <strong>Brave on iOS</strong> which often blocks camera access for privacy.<br>
+                    <strong>Recommended:</strong> Use Safari browser for best camera functionality, or use the "Camera Roll" button to upload photos instead.
+                `;
+            } else if (isBrave) {
+                browserWarning.style.display = 'block';
+                browserWarningText.innerHTML = `
+                    You're using <strong>Brave browser</strong> which has strict privacy settings.<br>
+                    If camera doesn't work, click the shield icon in the address bar and enable camera access.
+                `;
+            } else if (isIOS && !isSafari) {
+                browserWarning.style.display = 'block';
+                browserWarningText.innerHTML = `
+                    For best camera functionality on iOS, we recommend using <strong>Safari browser</strong>.<br>
+                    Current browser may have limited camera support.
+                `;
+            }
+            
+            // Check if camera API is supported
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 console.warn('Camera API not supported in this browser');
-                // You could show a warning message here if needed
+                if (browserWarning.style.display === 'none') {
+                    browserWarning.style.display = 'block';
+                    browserWarningText.innerHTML = `
+                        <strong>Camera not supported</strong> in this browser.<br>
+                        Please use the "Camera Roll" and "Upload Document" buttons instead.
+                    `;
+                }
             }
         });
     </script>
