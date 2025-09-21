@@ -257,6 +257,67 @@
             align-items: center;
             justify-content: center;
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .camera-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .camera-preview canvas {
+            display: none;
+        }
+        
+        .camera-error {
+            text-align: center;
+            color: #ff6b6b;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .recording-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .recording-indicator.active {
+            display: block;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .recording-timer {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .recording-timer.active {
+            display: block;
         }
         
         .camera-buttons {
@@ -660,11 +721,18 @@ Examples:
                 <!-- Camera Interface -->
                 <div class="camera-controls" id="cameraControls">
                     <div class="camera-preview" id="cameraPreview">
-                        📷 Camera not accessible in demo
+                        <video id="cameraVideo" autoplay muted playsinline></video>
+                        <canvas id="captureCanvas"></canvas>
+                        <div class="recording-indicator" id="recordingIndicator">● REC</div>
+                        <div class="recording-timer" id="recordingTimer">00:00</div>
+                        <div class="camera-error" id="cameraError" style="display: none;">
+                            Camera not available. Please check permissions.
+                        </div>
                     </div>
                     <div class="camera-buttons">
                         <button class="camera-btn cancel" onclick="closeCamera()">Cancel</button>
-                        <button class="camera-btn capture" onclick="capturePhoto()">📸 Capture</button>
+                        <button class="camera-btn capture" onclick="capturePhoto()" id="captureBtn">📸 Capture</button>
+                        <button class="camera-btn capture" onclick="toggleVideoRecording()" id="recordBtn" style="display: none;">🎥 Record</button>
                         <button class="camera-btn switch" onclick="switchCamera()">🔄 Switch</button>
                     </div>
                 </div>
@@ -938,23 +1006,80 @@ Examples:
             let previewContent = '';
             if (mediaItem.type === 'image') {
                 previewContent = mediaItem.url ? 
-                    `<img src="${mediaItem.url}" alt="${mediaItem.name}">` :
+                    `<img src="${mediaItem.url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;">` :
                     '<div class="media-preview">📷</div>';
             } else if (mediaItem.type === 'video') {
-                previewContent = '<div class="media-preview video">🎥<div class="play-icon">▶️</div></div>';
+                if (mediaItem.url) {
+                    previewContent = `
+                        <div class="media-preview video" style="position: relative;">
+                            <video src="${mediaItem.url}" style="width: 100%; height: 120px; object-fit: cover;" muted></video>
+                            <div class="play-icon" onclick="playVideo('${mediaItem.url}', '${mediaItem.name}')" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 30px; color: white; cursor: pointer;">▶️</div>
+                        </div>`;
+                } else {
+                    previewContent = '<div class="media-preview video">🎥<div class="play-icon">▶️</div></div>';
+                }
             } else {
                 previewContent = '<div class="media-preview">📄</div>';
             }
+            
+            const sizeInfo = mediaItem.size ? ` (${formatFileSize(mediaItem.size)})` : '';
+            const durationInfo = mediaItem.duration ? ` - ${mediaItem.duration}s` : '';
             
             mediaElement.innerHTML = `
                 ${previewContent}
                 <button class="remove-btn" onclick="removeMedia(${mediaItem.id})">×</button>
                 <div class="media-description">
                     <input type="text" placeholder="Add description..." value="${mediaItem.description}" onchange="updateDescription(${mediaItem.id}, this.value)">
+                    <div style="font-size: 10px; color: #999; margin-top: 2px;">${mediaItem.name}${sizeInfo}${durationInfo}</div>
                 </div>
             `;
             
             gallery.appendChild(mediaElement);
+        }
+        
+        function playVideo(videoUrl, videoName) {
+            // Create a modal to play the video
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="max-width: 90%; max-height: 90%; position: relative;">
+                    <video controls autoplay style="width: 100%; height: auto; max-height: 80vh;">
+                        <source src="${videoUrl}" type="video/webm">
+                        Your browser doesn't support video playback.
+                    </video>
+                    <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: -40px; right: 0; background: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;">Close ×</button>
+                    <div style="color: white; text-align: center; margin-top: 10px;">${videoName}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
         function showProcessingAnimation(mediaId) {
@@ -1090,6 +1215,29 @@ Examples:
                     this.classList.add('selected');
                 }
             });
+        });
+        
+        // Cleanup on page unload to prevent memory leaks
+        window.addEventListener('beforeunload', () => {
+            // Stop camera
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Clean up blob URLs
+            uploadedMedia.forEach(item => {
+                if (item.url && item.url.startsWith('blob:')) {
+                    URL.revokeObjectURL(item.url);
+                }
+            });
+        });
+        
+        // Check for camera support on load
+        window.addEventListener('load', () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.warn('Camera API not supported in this browser');
+                // You could show a warning message here if needed
+            }
         });
     </script>
 </body>
