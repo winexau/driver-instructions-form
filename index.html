@@ -827,17 +827,37 @@ Examples:
         // File upload handling
         function handleFileUpload(files, type) {
             Array.from(files).forEach(file => {
+                // Validate file size (10MB limit)
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification(`File ${file.name} is too large. Maximum size is 10MB.`, 'error');
+                    return;
+                }
+                
+                // Validate file type
+                const validTypes = {
+                    'image': ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+                    'video': ['video/mp4', 'video/webm', 'video/avi', 'video/mov'],
+                    'document': ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+                };
+                
+                if (!validTypes[type].includes(file.type)) {
+                    showNotification(`Invalid file type for ${file.name}. Please check supported formats.`, 'error');
+                    return;
+                }
+                
                 const mediaItem = {
                     id: ++mediaCounter,
                     file: file,
                     name: file.name,
                     type: type,
                     size: file.size,
-                    description: `${type} file`
+                    description: `${type} file`,
+                    mimeType: file.type
                 };
                 
                 uploadedMedia.push(mediaItem);
                 addMediaToGallery(mediaItem);
+                showNotification(`${file.name} added successfully`, 'success');
             });
         }
         
@@ -849,8 +869,13 @@ Examples:
             
             let previewContent = '';
             if (mediaItem.type === 'image') {
-                const url = URL.createObjectURL(mediaItem.file);
-                previewContent = `<img src="${url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;">`;
+                try {
+                    const url = URL.createObjectURL(mediaItem.file);
+                    previewContent = `<img src="${url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;" onload="console.log('Image loaded successfully')">`;
+                } catch (error) {
+                    console.error('Error creating image preview:', error);
+                    previewContent = '<div class="media-preview">📷</div>';
+                }
             } else if (mediaItem.type === 'video') {
                 previewContent = '<div class="media-preview">🎥</div>';
             } else {
@@ -861,7 +886,8 @@ Examples:
                 ${previewContent}
                 <button class="remove-btn" onclick="removeMedia(${mediaItem.id})">×</button>
                 <div class="media-description">
-                    <div style="font-size: 10px; color: #999;">${mediaItem.name} (${formatFileSize(mediaItem.size)})</div>
+                    <div style="font-size: 10px; color: #999; margin-bottom: 3px;">${mediaItem.name}</div>
+                    <div style="font-size: 9px; color: #666;">${formatFileSize(mediaItem.size)} • ${mediaItem.type}</div>
                 </div>
             `;
             
@@ -888,34 +914,85 @@ Examples:
         async function submitForm() {
             try {
                 showLoading('Submitting your instructions...');
+                console.log('Starting form submission process...');
                 
                 // 1. Ensure driver exists or create new one
+                console.log('Step 1: Creating/finding driver...');
                 const driverId = await ensureDriverExists();
+                console.log('Driver ID:', driverId);
                 
                 // 2. Create submissions for each selected branch
+                console.log('Step 2: Creating submissions for', selectedBranches.length, 'branches...');
                 const submissionPromises = selectedBranches.map(branch => 
                     createSubmissionForBranch(driverId, branch)
                 );
                 
                 const submissions = await Promise.all(submissionPromises);
+                console.log('Created submissions:', submissions);
                 
                 // 3. Upload media files for each submission
                 if (uploadedMedia.length > 0) {
+                    console.log('Step 3: Uploading', uploadedMedia.length, 'media files...');
                     showLoading('Uploading media files...');
+                    
+                    // Test storage access first
+                    const storageTest = await testStorageAccess();
+                    if (!storageTest) {
+                        throw new Error('Storage access test failed. Please check bucket configuration.');
+                    }
+                    
                     await Promise.all(
                         submissions.map(submission => 
                             uploadMediaFiles(submission.id)
                         )
                     );
+                    console.log('Media upload completed');
+                } else {
+                    console.log('No media files to upload');
                 }
                 
                 hideLoading();
                 showSuccessPage(submissions);
+                console.log('Form submission completed successfully!');
                 
             } catch (error) {
                 hideLoading();
-                console.error('Error submitting form:', error);
-                showNotification('Error submitting form. Please try again.', 'error');
+                console.error('Form submission failed:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+                showNotification(`Submission failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test storage access before uploading
+        async function testStorageAccess() {
+            try {
+                console.log('Testing storage access...');
+                
+                // Try to list files in the bucket (this tests basic access)
+                const { data, error } = await supabase.storage
+                    .from('submission-media')
+                    .list('test', {
+                        limit: 1
+                    });
+                
+                if (error) {
+                    console.error('Storage access test failed:', error);
+                    if (error.message.includes('not found')) {
+                        throw new Error('Storage bucket "submission-media" not found. Please create it in Supabase dashboard.');
+                    }
+                    throw new Error(`Storage access error: ${error.message}`);
+                }
+                
+                console.log('✅ Storage access test passed');
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Storage access test failed:', error);
+                showNotification(error.message, 'error');
+                return false;
             }
         }
         
@@ -970,18 +1047,49 @@ Examples:
         }
         
         async function uploadMediaFiles(submissionId) {
+            if (uploadedMedia.length === 0) return;
+            
+            showLoading('Uploading media files...');
+            let uploadedCount = 0;
+            let totalFiles = uploadedMedia.length;
+            
             for (const mediaItem of uploadedMedia) {
                 try {
+                    uploadedCount++;
+                    showLoading(`Uploading file ${uploadedCount}/${totalFiles}: ${mediaItem.name}`);
+                    
+                    // Create unique filename to avoid conflicts
+                    const timestamp = Date.now();
+                    const randomString = Math.random().toString(36).substring(2, 8);
+                    const fileExtension = mediaItem.name.split('.').pop();
+                    const uniqueFileName = `${timestamp}_${randomString}.${fileExtension}`;
+                    const filePath = `${submissionId}/${uniqueFileName}`;
+                    
+                    console.log('Uploading file:', {
+                        name: mediaItem.name,
+                        size: mediaItem.size,
+                        type: mediaItem.mimeType,
+                        path: filePath
+                    });
+                    
                     // Upload file to Supabase Storage
-                    const fileName = `${submissionId}/${Date.now()}_${mediaItem.name}`;
                     const { data: uploadData, error: uploadError } = await supabase.storage
                         .from('submission-media')
-                        .upload(fileName, mediaItem.file);
+                        .upload(filePath, mediaItem.file, {
+                            cacheControl: '3600',
+                            upsert: false,
+                            contentType: mediaItem.mimeType
+                        });
 
-                    if (uploadError) throw uploadError;
+                    if (uploadError) {
+                        console.error('Storage upload error:', uploadError);
+                        throw new Error(`Storage upload failed: ${uploadError.message}`);
+                    }
+
+                    console.log('File uploaded successfully:', uploadData);
 
                     // Save file record to database
-                    const { error: dbError } = await supabase
+                    const { data: dbData, error: dbError } = await supabase
                         .from('media_files')
                         .insert({
                             submission_id: submissionId,
@@ -989,16 +1097,27 @@ Examples:
                             file_type: mediaItem.type,
                             file_size: mediaItem.size,
                             storage_path: uploadData.path,
-                            description: mediaItem.description
-                        });
+                            description: mediaItem.description || `${mediaItem.type} file`
+                        })
+                        .select();
 
-                    if (dbError) throw dbError;
+                    if (dbError) {
+                        console.error('Database insert error:', dbError);
+                        throw new Error(`Database insert failed: ${dbError.message}`);
+                    }
+
+                    console.log('Media record saved to database:', dbData);
 
                 } catch (error) {
-                    console.error('Error uploading media:', error);
-                    showNotification(`Error uploading ${mediaItem.name}`, 'error');
+                    console.error(`Error uploading ${mediaItem.name}:`, error);
+                    showNotification(`Failed to upload ${mediaItem.name}: ${error.message}`, 'error');
+                    
+                    // Continue with other files even if one fails
+                    continue;
                 }
             }
+            
+            console.log(`Successfully uploaded ${uploadedCount} media files`);
         }
         
         function showSuccessPage(submissions) {
