@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smartways Admin Portal - Delivery Instructions Management</title>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration -->
+    <script>
+        // Replace with your actual Supabase credentials
+        const SUPABASE_URL = 'https://alilybrgbpdawrbryyqh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsaWx5YnJnYnBkYXdyYnJ5eXFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0MzA2NTcsImV4cCI6MjA3NDAwNjY1N30.aZJOqX7dA0BICI3uSuszb0DhTjGjmJMA_Fnx6z5TqX4';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        console.log('Supabase client initialized:', supabase);
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -1199,128 +1215,203 @@
     </div>
 
     <script>
-        // Sample data
-        const submissionsData = [
-            {
-                id: 1,
-                driver: 'Mike Johnson',
-                driverUsername: 'mjohnson',
-                driverRegion: 'Sydney',
-                client: 'Woolworths CBD',
-                clientCode: 'WW-CBD-001',
-                branch: 'CBD Store',
-                submitted: '2025-09-21 09:30',
-                lastModified: '2025-09-21 09:35',
-                status: 'pending',
-                priority: 'high',
-                media: ['📷', '🎥', '📄'],
-                mediaCount: 3,
-                mediaTypes: 'Photo, Video, Document',
-                mediaSize: '11.3 MB',
-                instructions: 'Use keypad code 1234# at main entrance. Loading dock is on level B2, use freight elevator only.',
-                instructionType: 'Access, Delivery',
-                frequency: 'Daily',
-                challenges: 'Heavy traffic during peak hours, parking can be difficult.',
-                reviewedBy: null,
-                reviewNotes: null
-            },
-            {
-                id: 2,
-                driver: 'Sarah Chen',
-                driverUsername: 'schen',
-                driverRegion: 'Sydney',
-                client: 'Coles Town Hall',
-                clientCode: 'CL-TH-002',
-                branch: 'Town Hall Store',
-                submitted: '2025-09-21 08:15',
-                lastModified: '2025-09-21 10:20',
-                status: 'approved',
-                priority: 'medium',
-                media: ['📷', '📷'],
-                mediaCount: 2,
-                mediaTypes: 'Photo',
-                mediaSize: '4.2 MB',
-                instructions: 'Delivery entrance via George Street side. Contact security desk first.',
-                instructionType: 'Access, Contact',
-                frequency: 'Weekly',
-                challenges: 'Security protocol must be followed strictly.',
-                reviewedBy: 'Admin User',
-                reviewNotes: 'Clear instructions, approved for implementation.'
-            },
-            {
-                id: 3,
-                driver: 'David Wilson',
-                driverUsername: 'dwilson',
-                driverRegion: 'Melbourne',
-                client: 'IGA Surry Hills',
-                clientCode: 'IGA-SH-003',
-                branch: 'Surry Hills Store',
-                submitted: '2025-09-21 07:45',
-                lastModified: '2025-09-21 09:15',
-                status: 'review',
-                priority: 'low',
-                media: ['🎥', '📄'],
-                mediaCount: 2,
-                mediaTypes: 'Video, Document',
-                mediaSize: '9.1 MB',
-                instructions: 'Small loading bay, reverse parking required. Call ahead 30 minutes before arrival.',
-                instructionType: 'Delivery, Timing',
-                frequency: 'Bi-weekly',
-                challenges: 'Limited space for large trucks.',
-                reviewedBy: null,
-                reviewNotes: null
-            },
-            {
-                id: 4,
-                driver: 'Emma Davis',
-                driverUsername: 'edavis',
-                driverRegion: 'Brisbane',
-                client: 'Metro Martin Place',
-                clientCode: 'MT-MP-004',
-                branch: 'Martin Place Store',
-                submitted: '2025-09-20 16:20',
-                lastModified: '2025-09-20 16:45',
-                status: 'approved',
-                priority: 'medium',
-                media: ['📷'],
-                mediaCount: 1,
-                mediaTypes: 'Photo',
-                mediaSize: '2.8 MB',
-                instructions: 'Underground delivery via ramp. Height restriction 2.5m.',
-                instructionType: 'Delivery, Special Handling',
-                frequency: 'Monthly',
-                challenges: 'Height restrictions, tight corners in underground access.',
-                reviewedBy: 'Admin User',
-                reviewNotes: 'Important height restriction noted, approved.'
-            },
-            {
-                id: 5,
-                driver: 'Tom Brown',
-                driverUsername: 'tbrown',
-                driverRegion: 'Perth',
-                client: 'Woolworths Bondi',
-                clientCode: 'WW-BD-005',
-                branch: 'Bondi Junction Store',
-                submitted: '2025-09-20 14:10',
-                lastModified: '2025-09-20 15:30',
-                status: 'rejected',
-                priority: 'low',
-                media: ['📄'],
-                mediaCount: 1,
-                mediaTypes: 'Document',
-                mediaSize: '0.2 MB',
-                instructions: 'Standard delivery to rear dock.',
-                instructionType: 'Delivery',
-                frequency: 'Weekly',
-                challenges: 'None noted.',
-                reviewedBy: 'Admin User',
-                reviewNotes: 'Insufficient detail provided, requires more specific instructions.'
+        // Sample data - REPLACE THIS SECTION WITH SUPABASE CALLS
+        let submissionsData = [];
+        
+        // Initialize Supabase data loading
+        async function loadSubmissionsFromDB() {
+            try {
+                showNotification('Loading submissions from database...', 'info');
+                
+                const { data, error } = await supabase
+                    .from('submissions')
+                    .select(`
+                        *,
+                        drivers(username, full_name, region),
+                        clients(name, client_code),
+                        branches(name),
+                        media_files(file_name, file_type, file_size)
+                    `)
+                    .order('submitted_at', { ascending: false });
+
+                if (error) throw error;
+
+                submissionsData = data.map(item => ({
+                    id: item.id,
+                    driver: item.drivers?.full_name || 'Unknown Driver',
+                    driverUsername: item.drivers?.username || '',
+                    driverRegion: item.drivers?.region || '',
+                    client: `${item.clients?.name || 'Unknown'} - ${item.branches?.name || 'Unknown'}`,
+                    clientCode: item.clients?.client_code || '',
+                    branch: item.branches?.name || '',
+                    submitted: new Date(item.submitted_at).toLocaleString(),
+                    lastModified: new Date(item.updated_at).toLocaleString(),
+                    status: item.status,
+                    priority: item.priority,
+                    mediaCount: item.media_files?.length || 0,
+                    mediaTypes: [...new Set((item.media_files || []).map(f => f.file_type))].join(', '),
+                    mediaSize: formatFileSize((item.media_files || []).reduce((sum, f) => sum + (f.file_size || 0), 0)),
+                    instructions: item.instructions,
+                    instructionType: item.instruction_types,
+                    frequency: item.delivery_frequency,
+                    challenges: item.challenges,
+                    reviewedBy: item.reviewed_by,
+                    reviewNotes: item.review_notes,
+                    media_files: item.media_files || []
+                }));
+
+                loadSubmissionsTable();
+                showNotification(`Loaded ${submissionsData.length} submissions successfully`, 'success');
+                
+            } catch (error) {
+                console.error('Error loading submissions:', error);
+                showNotification('Error loading data from database. Using sample data.', 'error');
+                
+                // Fallback to sample data if database fails
+                loadSampleData();
             }
-        ];
+        }
+        
+        // Fallback sample data function
+        function loadSampleData() {
+            submissionsData = [
+                {
+                    id: 1,
+                    driver: 'Mike Johnson',
+                    driverUsername: 'mjohnson',
+                    driverRegion: 'Sydney',
+                    client: 'Woolworths CBD',
+                    clientCode: 'WW-CBD-001',
+                    branch: 'CBD Store',
+                    submitted: '2025-09-21 09:30',
+                    lastModified: '2025-09-21 09:35',
+                    status: 'pending',
+                    priority: 'high',
+                    media: ['📷', '🎥', '📄'],
+                    mediaCount: 3,
+                    mediaTypes: 'Photo, Video, Document',
+                    mediaSize: '11.3 MB',
+                    instructions: 'Use keypad code 1234# at main entrance. Loading dock is on level B2, use freight elevator only.',
+                    instructionType: 'Access, Delivery',
+                    frequency: 'Daily',
+                    challenges: 'Heavy traffic during peak hours, parking can be difficult.',
+                    reviewedBy: null,
+                    reviewNotes: null
+                },
+                {
+                    id: 2,
+                    driver: 'Sarah Chen',
+                    driverUsername: 'schen',
+                    driverRegion: 'Sydney',
+                    client: 'Coles Town Hall',
+                    clientCode: 'CL-TH-002',
+                    branch: 'Town Hall Store',
+                    submitted: '2025-09-21 08:15',
+                    lastModified: '2025-09-21 10:20',
+                    status: 'approved',
+                    priority: 'medium',
+                    media: ['📷', '📷'],
+                    mediaCount: 2,
+                    mediaTypes: 'Photo',
+                    mediaSize: '4.2 MB',
+                    instructions: 'Delivery entrance via George Street side. Contact security desk first.',
+                    instructionType: 'Access, Contact',
+                    frequency: 'Weekly',
+                    challenges: 'Security protocol must be followed strictly.',
+                    reviewedBy: 'Admin User',
+                    reviewNotes: 'Clear instructions, approved for implementation.'
+                },
+                {
+                    id: 3,
+                    driver: 'David Wilson',
+                    driverUsername: 'dwilson',
+                    driverRegion: 'Melbourne',
+                    client: 'IGA Surry Hills',
+                    clientCode: 'IGA-SH-003',
+                    branch: 'Surry Hills Store',
+                    submitted: '2025-09-21 07:45',
+                    lastModified: '2025-09-21 09:15',
+                    status: 'review',
+                    priority: 'low',
+                    media: ['🎥', '📄'],
+                    mediaCount: 2,
+                    mediaTypes: 'Video, Document',
+                    mediaSize: '9.1 MB',
+                    instructions: 'Small loading bay, reverse parking required. Call ahead 30 minutes before arrival.',
+                    instructionType: 'Delivery, Timing',
+                    frequency: 'Bi-weekly',
+                    challenges: 'Limited space for large trucks.',
+                    reviewedBy: null,
+                    reviewNotes: null
+                },
+                {
+                    id: 4,
+                    driver: 'Emma Davis',
+                    driverUsername: 'edavis',
+                    driverRegion: 'Brisbane',
+                    client: 'Metro Martin Place',
+                    clientCode: 'MT-MP-004',
+                    branch: 'Martin Place Store',
+                    submitted: '2025-09-20 16:20',
+                    lastModified: '2025-09-20 16:45',
+                    status: 'approved',
+                    priority: 'medium',
+                    media: ['📷'],
+                    mediaCount: 1,
+                    mediaTypes: 'Photo',
+                    mediaSize: '2.8 MB',
+                    instructions: 'Underground delivery via ramp. Height restriction 2.5m.',
+                    instructionType: 'Delivery, Special Handling',
+                    frequency: 'Monthly',
+                    challenges: 'Height restrictions, tight corners in underground access.',
+                    reviewedBy: 'Admin User',
+                    reviewNotes: 'Important height restriction noted, approved.'
+                },
+                {
+                    id: 5,
+                    driver: 'Tom Brown',
+                    driverUsername: 'tbrown',
+                    driverRegion: 'Perth',
+                    client: 'Woolworths Bondi',
+                    clientCode: 'WW-BD-005',
+                    branch: 'Bondi Junction Store',
+                    submitted: '2025-09-20 14:10',
+                    lastModified: '2025-09-20 15:30',
+                    status: 'rejected',
+                    priority: 'low',
+                    media: ['📄'],
+                    mediaCount: 1,
+                    mediaTypes: 'Document',
+                    mediaSize: '0.2 MB',
+                    instructions: 'Standard delivery to rear dock.',
+                    instructionType: 'Delivery',
+                    frequency: 'Weekly',
+                    challenges: 'None noted.',
+                    reviewedBy: 'Admin User',
+                    reviewNotes: 'Insufficient detail provided, requires more specific instructions.'
+                }
+            ];
+            
+            loadSubmissionsTable();
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            loadSubmissionsTable();
+            // Try to load from Supabase, fallback to sample data
+            if (typeof supabase !== 'undefined') {
+                loadSubmissionsFromDB();
+            } else {
+                console.warn('Supabase not available, using sample data');
+                loadSampleData();
+            }
         });
         
         // Sidebar toggle
