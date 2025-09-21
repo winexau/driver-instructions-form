@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Instructions Collection Form</title>
+    <title>Enhanced Driver Instructions Collection Form</title>
     
-    <!-- Supabase SDK -->
+    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration -->
+    <script>
+        // Replace with your actual Supabase credentials
+        const SUPABASE_URL = 'https://umlkgeczmehclbmmpuuv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGtnZWN6bWVoY2xibW1wdXV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTUxOTQsImV4cCI6MjA3NDAzMTE5NH0.GrJMY3LL9_QJMmgcTFHY6ezqxgAPPplYLulzUVX4aBs';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        console.log('Supabase client initialized for driver form:', supabase);
+    </script>
     
     <style>
         * {
@@ -191,7 +203,6 @@
             color: white;
         }
         
-        /* Multimedia Upload Sections */
         .media-upload-section {
             background: #f0f8ff;
             border: 2px dashed #2196F3;
@@ -200,10 +211,6 @@
             margin: 20px 0;
             text-align: center;
             transition: all 0.3s ease;
-        }
-        
-        .media-upload-section:hover {
-            background: #e8f4fd;
         }
         
         .upload-options {
@@ -230,126 +237,6 @@
         
         .upload-btn:hover {
             background: #2196F3;
-            color: white;
-        }
-        
-        .camera-controls {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .camera-controls.active {
-            display: block;
-        }
-        
-        .camera-preview {
-            width: 100%;
-            max-width: 400px;
-            height: 300px;
-            background: #000;
-            border-radius: 8px;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .camera-preview video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        
-        .camera-preview canvas {
-            display: none;
-        }
-        
-        .camera-error {
-            text-align: center;
-            color: #ff6b6b;
-            padding: 20px;
-            font-size: 14px;
-        }
-        
-        .recording-indicator {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(244, 67, 54, 0.9);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            display: none;
-        }
-        
-        .recording-indicator.active {
-            display: block;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        
-        .recording-timer {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 14px;
-            display: none;
-        }
-        
-        .recording-timer.active {
-            display: block;
-        }
-        
-        .camera-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .camera-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .camera-btn.capture {
-            background: #f44336;
-            color: white;
-            font-size: 18px;
-            padding: 15px 25px;
-        }
-        
-        .camera-btn.cancel {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .camera-btn.switch {
-            background: #ff9800;
             color: white;
         }
         
@@ -392,23 +279,6 @@
             object-fit: cover;
         }
         
-        .media-preview.video {
-            background: #000;
-            color: white;
-            position: relative;
-        }
-        
-        .play-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 30px;
-            color: white;
-            opacity: 0.8;
-            cursor: pointer;
-        }
-        
         .media-item .remove-btn {
             position: absolute;
             top: 5px;
@@ -424,69 +294,11 @@
             transition: all 0.3s ease;
         }
         
-        .media-item .remove-btn:hover {
-            background: #f44336;
-            transform: scale(1.1);
-        }
-        
         .media-description {
             padding: 8px;
             font-size: 12px;
             color: #666;
             border-top: 1px solid #e1e5e9;
-        }
-        
-        .media-description input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 11px;
-            padding: 2px;
-        }
-        
-        .processing-indicator {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(33, 150, 243, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-        }
-        
-        .spinner {
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top: 2px solid white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 8px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .progress-bar {
-            width: 80%;
-            height: 4px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 2px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: white;
-            transition: width 0.3s ease;
         }
         
         .btn {
@@ -567,18 +379,21 @@
             line-height: 1.5;
         }
         
-        /* Loading overlay for backend operations */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: rgba(0,0,0,0.7);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 2000;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
         }
         
         .loading-content {
@@ -589,15 +404,50 @@
             max-width: 300px;
         }
         
-        /* Browser compatibility warning */
-        .browser-warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2196F3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: #856404;
-            display: none;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #4CAF50;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .notification.info {
+            background: #2196F3;
         }
         
         @media (max-width: 768px) {
@@ -612,42 +462,25 @@
             .upload-options {
                 grid-template-columns: 1fr;
             }
-            
-            .media-gallery {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
-            
-            .instruction-type {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading overlay for submissions -->
+    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="spinner"></div>
-            <div id="loadingText">Saving your instructions...</div>
-            <div style="font-size: 12px; color: #666; margin-top: 10px;">
-                Please don't close this page
-            </div>
+            <div id="loadingText">Submitting your instructions...</div>
         </div>
     </div>
 
     <div class="container">
         <div class="header">
-            <h1>📱 Driver Instructions Collection</h1>
+            <h1>📱 Enhanced Driver Instructions</h1>
             <p>Capture delivery instructions with photos, videos & documents</p>
         </div>
         
         <div class="form-section">
-            <!-- Browser Compatibility Warning -->
-            <div id="browserWarning" class="browser-warning">
-                <strong>⚠️ Browser Compatibility Notice</strong>
-                <div id="browserWarningText" style="margin-top: 8px; font-size: 14px;"></div>
-            </div>
-            
             <div class="step-indicator">
                 <div class="step-dot active"></div>
                 <div class="step-dot"></div>
@@ -660,21 +493,21 @@
                 <h2 style="margin-bottom: 20px;">Driver Information</h2>
                 <div class="form-group">
                     <label for="driverUsername">Driver Username/ID</label>
-                    <input type="text" id="driverUsername" placeholder="Enter your driver ID">
+                    <input type="text" id="driverUsername" placeholder="Enter your driver ID" required>
                 </div>
                 <div class="form-group">
                     <label for="driverName">Full Name</label>
-                    <input type="text" id="driverName" placeholder="Enter your full name">
+                    <input type="text" id="driverName" placeholder="Enter your full name" required>
                 </div>
                 <div class="form-group">
                     <label for="region">Primary Region</label>
-                    <select id="region">
+                    <select id="region" required>
                         <option value="">Select your region</option>
-                        <option value="sydney">Sydney</option>
-                        <option value="melbourne">Melbourne</option>
-                        <option value="brisbane">Brisbane</option>
-                        <option value="perth">Perth</option>
-                        <option value="adelaide">Adelaide</option>
+                        <option value="Sydney">Sydney</option>
+                        <option value="Melbourne">Melbourne</option>
+                        <option value="Brisbane">Brisbane</option>
+                        <option value="Perth">Perth</option>
+                        <option value="Adelaide">Adelaide</option>
                     </select>
                 </div>
             </div>
@@ -685,22 +518,7 @@
                 <p style="margin-bottom: 20px; color: #666;">Choose the master client you'd like to provide instructions for:</p>
                 
                 <div id="clientsList">
-                    <div class="client-card" data-client="woolworths">
-                        <div class="client-name">Woolworths Group</div>
-                        <div class="client-info">15 branches • Weekly deliveries • High volume</div>
-                    </div>
-                    <div class="client-card" data-client="coles">
-                        <div class="client-name">Coles Supermarkets</div>
-                        <div class="client-info">8 branches • Daily deliveries • Medium volume</div>
-                    </div>
-                    <div class="client-card" data-client="iga">
-                        <div class="client-name">IGA Stores</div>
-                        <div class="client-info">22 branches • Bi-weekly deliveries • Mixed volume</div>
-                    </div>
-                    <div class="client-card" data-client="metro">
-                        <div class="client-name">Metro Food Markets</div>
-                        <div class="client-info">5 branches • Weekly deliveries • Low volume</div>
-                    </div>
+                    <!-- Clients will be loaded from database -->
                 </div>
             </div>
             
@@ -714,7 +532,7 @@
                 </div>
             </div>
             
-            <!-- Step 4: Instructions Input with Multimedia -->
+            <!-- Step 4: Enhanced Instructions Input with Multimedia -->
             <div class="step" id="step4">
                 <h2 style="margin-bottom: 20px;">Delivery Instructions & Media</h2>
                 
@@ -738,7 +556,7 @@ Examples:
 • Loading dock: Enter via side entrance, dock bay 3
 • Contact: Call Sarah (0404 123 456) on arrival
 • Timing: Deliveries only between 8AM-4PM weekdays
-• Special: Fragile items - use freight elevator only"></textarea>
+• Special: Fragile items - use freight elevator only" required></textarea>
                 </div>
                 
                 <!-- Multimedia Upload Section -->
@@ -747,45 +565,23 @@ Examples:
                     <p style="color: #666; margin-bottom: 20px;">Visual instructions help other drivers understand complex procedures</p>
                     
                     <div class="upload-options">
-                        <button class="upload-btn" onclick="openCamera()">
-                            📷
-                            <span>Take Photo</span>
-                        </button>
-                        <button class="upload-btn" onclick="startVideoRecord()">
-                            🎥
-                            <span>Record Video</span>
-                        </button>
                         <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
-                            🖼️
-                            <span>Camera Roll</span>
+                            📷
+                            <span>Upload Photos</span>
+                        </button>
+                        <button class="upload-btn" onclick="document.getElementById('videoInput').click()">
+                            🎥
+                            <span>Upload Videos</span>
                         </button>
                         <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                             📄
-                            <span>Upload Document</span>
+                            <span>Upload Documents</span>
                         </button>
                     </div>
                     
-                    <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx,.txt" multiple onchange="handleFileUpload(this.files)">
-                    <input type="file" id="imageInput" class="file-input" accept="image/*,video/*" multiple capture="environment" onchange="handleImageUpload(this.files)">
-                </div>
-                
-                <!-- Camera Interface -->
-                <div class="camera-controls" id="cameraControls">
-                    <div class="camera-preview" id="cameraPreview">
-                        <video id="cameraVideo" autoplay muted playsinline></video>
-                        <canvas id="captureCanvas"></canvas>
-                        <div class="recording-indicator" id="recordingIndicator">● REC</div>
-                        <div class="recording-timer" id="recordingTimer">00:00</div>
-                        <div class="camera-error" id="cameraError" style="display: none;">
-                            Camera not available. Please check permissions.
-                        </div>
-                    </div>
-                    <div class="camera-buttons">
-                        <button class="camera-btn cancel" onclick="closeCamera()">Cancel</button>
-                        <button class="camera-btn capture" onclick="capturePhoto()" id="captureBtn">📸 Capture</button>
-                        <button class="camera-btn capture" onclick="toggleVideoRecording()" id="recordBtn" style="display: none;">🎥 Record</button>
-                        <button class="camera-btn switch" onclick="switchCamera()">🔄 Switch</button>
-                    </div>
+                    <input type="file" id="imageInput" class="file-input" accept="image/*" multiple onchange="handleFileUpload(this.files, 'image')">
+                    <input type="file" id="videoInput" class="file-input" accept="video/*" multiple onchange="handleFileUpload(this.files, 'video')">
+                    <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx,.txt" multiple onchange="handleFileUpload(this.files, 'document')">
                 </div>
                 
                 <!-- Tips Section -->
@@ -795,8 +591,6 @@ Examples:
                         • <strong>Photos:</strong> Show gate keypads, entrance signs, loading docks<br>
                         • <strong>Videos:</strong> Record complex access procedures or safety protocols<br>
                         • <strong>Documents:</strong> Attach site maps, contact lists, or special forms<br>
-                        • <strong>Camera Issues:</strong> If camera doesn't work, use "Camera Roll" button instead<br>
-                        • <strong>Brave Browser:</strong> Tap shield icon in address bar → enable camera access<br>
                         • <strong>Quality:</strong> Ensure good lighting and clear visibility
                     </div>
                 </div>
@@ -808,13 +602,13 @@ Examples:
                 
                 <div class="form-group">
                     <label for="frequency">Delivery Frequency</label>
-                    <select id="frequency">
+                    <select id="frequency" required>
                         <option value="">Select frequency</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="biweekly">Bi-weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="irregular">Irregular</option>
+                        <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Bi-weekly">Bi-weekly</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Irregular">Irregular</option>
                     </select>
                 </div>
                 
@@ -846,94 +640,120 @@ Examples:
     </div>
 
     <script>
-        // =============================================================================
-        // SUPABASE CONFIGURATION
-        // =============================================================================
-        
-        // 🚨 REPLACE THESE WITH YOUR SUPABASE PROJECT DETAILS
-        const SUPABASE_URL = 'https://umlkgeczmehclbmmpuuv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGtnZWN6bWVoY2xibW1wdXV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTUxOTQsImV4cCI6MjA3NDAzMTE5NH0.GrJMY3LL9_QJMmgcTFHY6ezqxgAPPplYLulzUVX4aBs';
-        
-        
-        // Initialize Supabase client
-        let supabase = null;
-        let isBackendConnected = false;
-        
-        // Initialize on page load
-        window.addEventListener('load', initializeBackend);
-        
-        async function initializeBackend() {
-            try {
-                // Check if configuration is set
-                if (SUPABASE_URL.includes('YOUR_PROJECT_ID') || SUPABASE_ANON_KEY.includes('YOUR_ANON_KEY')) {
-                    console.warn('Supabase not configured - submissions will be stored locally');
-                    isBackendConnected = false;
-                    return;
-                }
-                
-                // Initialize Supabase
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
-                // Test connection quietly
-                const { data, error } = await supabase.from('instruction_submissions').select('count', { count: 'exact', head: true });
-                
-                if (error) {
-                    console.warn('Database connection failed, using local storage fallback');
-                    isBackendConnected = false;
-                } else {
-                    isBackendConnected = true;
-                    console.log('✅ Connected to cloud database');
-                }
-                
-            } catch (error) {
-                console.warn('Backend initialization failed:', error.message);
-                isBackendConnected = false;
-            }
-        }
-        
-        // =============================================================================
-        // FORM VARIABLES AND DATA
-        // =============================================================================
-        
         let currentStep = 1;
-        let selectedClient = '';
+        let selectedClient = null;
         let selectedBranches = [];
         let selectedInstructionTypes = [];
         let uploadedMedia = [];
         let mediaCounter = 0;
+        let clients = [];
+        let branches = [];
         
-        // Camera and video recording variables
-        let currentStream = null;
-        let mediaRecorder = null;
-        let recordedChunks = [];
-        let isRecording = false;
-        let recordingStartTime = null;
-        let recordingTimer = null;
-        let currentFacingMode = 'environment';
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof supabase !== 'undefined') {
+                loadClientsFromDB();
+            } else {
+                console.error('Supabase not available');
+                showNotification('Database connection failed. Please refresh the page.', 'error');
+            }
+        });
         
-        const branchData = {
-            woolworths: [
-                'Woolworths Sydney CBD', 'Woolworths Bondi Junction', 'Woolworths Parramatta',
-                'Woolworths Chatswood', 'Woolworths Miranda', 'Woolworths Blacktown'
-            ],
-            coles: [
-                'Coles Town Hall', 'Coles World Square', 'Coles Westfield Bondi',
-                'Coles Macquarie Centre', 'Coles Eastgardens'
-            ],
-            iga: [
-                'IGA Surry Hills', 'IGA Paddington', 'IGA Mosman', 'IGA Balmain',
-                'IGA Double Bay', 'IGA Neutral Bay'
-            ],
-            metro: [
-                'Metro Martin Place', 'Metro Circular Quay', 'Metro Wynyard',
-                'Metro Central', 'Metro Kings Cross'
-            ]
-        };
+        // Load clients from Supabase
+        async function loadClientsFromDB() {
+            try {
+                const { data, error } = await supabase
+                    .from('clients')
+                    .select('*')
+                    .order('name');
+
+                if (error) throw error;
+
+                clients = data;
+                displayClients();
+                
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                showNotification('Error loading clients from database', 'error');
+            }
+        }
         
-        // =============================================================================
-        // STEP NAVIGATION
-        // =============================================================================
+        // Display clients in the UI
+        function displayClients() {
+            const clientsList = document.getElementById('clientsList');
+            clientsList.innerHTML = '';
+            
+            clients.forEach(client => {
+                const clientCard = document.createElement('div');
+                clientCard.className = 'client-card';
+                clientCard.dataset.clientId = client.id;
+                clientCard.innerHTML = `
+                    <div class="client-name">${client.name}</div>
+                    <div class="client-info">${client.branches_count || 0} branches • ${client.type}</div>
+                `;
+                clientCard.onclick = () => selectClient(client, clientCard);
+                clientsList.appendChild(clientCard);
+            });
+        }
         
+        // Select a client
+        function selectClient(client, element) {
+            document.querySelectorAll('.client-card').forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedClient = client;
+            loadBranches();
+        }
+        
+        // Load branches for selected client
+        async function loadBranches() {
+            if (!selectedClient) return;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('branches')
+                    .select('*')
+                    .eq('client_id', selectedClient.id)
+                    .order('name');
+
+                if (error) throw error;
+
+                branches = data;
+                displayBranches();
+                
+            } catch (error) {
+                console.error('Error loading branches:', error);
+                showNotification('Error loading branches', 'error');
+            }
+        }
+        
+        // Display branches
+        function displayBranches() {
+            const branchesList = document.getElementById('branchesList');
+            branchesList.innerHTML = '';
+            
+            branches.forEach(branch => {
+                const branchCard = document.createElement('div');
+                branchCard.className = 'branch-card';
+                branchCard.dataset.branchId = branch.id;
+                branchCard.textContent = branch.name;
+                branchCard.onclick = () => toggleBranch(branch, branchCard);
+                branchesList.appendChild(branchCard);
+            });
+        }
+        
+        // Toggle branch selection
+        function toggleBranch(branch, element) {
+            const index = selectedBranches.findIndex(b => b.id === branch.id);
+            if (index > -1) {
+                selectedBranches.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                selectedBranches.push(branch);
+                element.classList.add('selected');
+            }
+        }
+        
+        // Step navigation
         function nextStep() {
             if (validateCurrentStep()) {
                 if (currentStep < 4) {
@@ -962,10 +782,6 @@ Examples:
             
             document.getElementById('prevBtn').style.display = step > 1 ? 'inline-block' : 'none';
             document.getElementById('nextBtn').textContent = step === 4 ? 'Submit' : 'Next';
-            
-            if (step === 3 && selectedClient) {
-                loadBranches();
-            }
         }
         
         function validateCurrentStep() {
@@ -976,21 +792,21 @@ Examples:
                     const region = document.getElementById('region').value;
                     
                     if (!username || !name || !region) {
-                        alert('Please fill in all required fields');
+                        showNotification('Please fill in all required fields', 'error');
                         return false;
                     }
                     return true;
                     
                 case 2:
                     if (!selectedClient) {
-                        alert('Please select a master client');
+                        showNotification('Please select a master client', 'error');
                         return false;
                     }
                     return true;
                     
                 case 3:
                     if (selectedBranches.length === 0) {
-                        alert('Please select at least one branch');
+                        showNotification('Please select at least one branch', 'error');
                         return false;
                     }
                     return true;
@@ -1000,7 +816,7 @@ Examples:
                     const frequency = document.getElementById('frequency').value;
                     
                     if (!instructions || !frequency) {
-                        alert('Please provide instructions and delivery frequency');
+                        showNotification('Please provide instructions and delivery frequency', 'error');
                         return false;
                     }
                     return true;
@@ -1008,230 +824,206 @@ Examples:
             return true;
         }
         
-        function loadBranches() {
-            const branchesList = document.getElementById('branchesList');
-            branchesList.innerHTML = '';
-            
-            if (branchData[selectedClient]) {
-                branchData[selectedClient].forEach(branch => {
-                    const branchCard = document.createElement('div');
-                    branchCard.className = 'branch-card';
-                    branchCard.textContent = branch;
-                    branchCard.onclick = () => toggleBranch(branch, branchCard);
-                    branchesList.appendChild(branchCard);
-                });
-            }
-        }
-        
-        function toggleBranch(branch, element) {
-            if (selectedBranches.includes(branch)) {
-                selectedBranches = selectedBranches.filter(b => b !== branch);
-                element.classList.remove('selected');
-            } else {
-                selectedBranches.push(branch);
-                element.classList.add('selected');
-            }
-        }
-        
-        // =============================================================================
-        // FORM SUBMISSION WITH BACKEND INTEGRATION
-        // =============================================================================
-        
-        async function submitForm() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            try {
-                // Validate form
-                if (!validateCurrentStep()) {
-                    return;
-                }
-                
-                // Show loading
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'Saving...';
-                loadingOverlay.style.display = 'flex';
-                document.getElementById('loadingText').textContent = 'Saving your instructions...';
-                
-                // Prepare form data
-                const formData = {
-                    driver_username: document.getElementById('driverUsername').value,
-                    driver_name: document.getElementById('driverName').value,
-                    driver_region: document.getElementById('region').value,
-                    master_client: selectedClient,
-                    selected_branches: selectedBranches,
-                    instruction_types: selectedInstructionTypes,
-                    instructions_text: document.getElementById('instructions').value,
-                    delivery_frequency: document.getElementById('frequency').value,
-                    common_challenges: document.getElementById('challenges').value || null,
-                    session_id: generateSessionId(),
-                    created_at: new Date().toISOString()
+        // File upload handling
+        function handleFileUpload(files, type) {
+            Array.from(files).forEach(file => {
+                const mediaItem = {
+                    id: ++mediaCounter,
+                    file: file,
+                    name: file.name,
+                    type: type,
+                    size: file.size,
+                    description: `${type} file`
                 };
                 
-                let submissionId = null;
+                uploadedMedia.push(mediaItem);
+                addMediaToGallery(mediaItem);
+            });
+        }
+        
+        function addMediaToGallery(mediaItem) {
+            const gallery = document.getElementById('mediaGallery');
+            const mediaElement = document.createElement('div');
+            mediaElement.className = 'media-item';
+            mediaElement.dataset.id = mediaItem.id;
+            
+            let previewContent = '';
+            if (mediaItem.type === 'image') {
+                const url = URL.createObjectURL(mediaItem.file);
+                previewContent = `<img src="${url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;">`;
+            } else if (mediaItem.type === 'video') {
+                previewContent = '<div class="media-preview">🎥</div>';
+            } else {
+                previewContent = '<div class="media-preview">📄</div>';
+            }
+            
+            mediaElement.innerHTML = `
+                ${previewContent}
+                <button class="remove-btn" onclick="removeMedia(${mediaItem.id})">×</button>
+                <div class="media-description">
+                    <div style="font-size: 10px; color: #999;">${mediaItem.name} (${formatFileSize(mediaItem.size)})</div>
+                </div>
+            `;
+            
+            gallery.appendChild(mediaElement);
+        }
+        
+        function removeMedia(mediaId) {
+            uploadedMedia = uploadedMedia.filter(item => item.id !== mediaId);
+            const mediaElement = document.querySelector(`[data-id="${mediaId}"]`);
+            if (mediaElement) {
+                mediaElement.remove();
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Main form submission
+        async function submitForm() {
+            try {
+                showLoading('Submitting your instructions...');
                 
-                if (isBackendConnected && supabase) {
-                    // Save to Supabase
-                    submissionId = await saveToSupabase(formData);
-                } else {
-                    // Fallback to local storage
-                    submissionId = await saveToLocalStorage(formData);
-                }
+                // 1. Ensure driver exists or create new one
+                const driverId = await ensureDriverExists();
                 
-                // Handle file uploads
+                // 2. Create submissions for each selected branch
+                const submissionPromises = selectedBranches.map(branch => 
+                    createSubmissionForBranch(driverId, branch)
+                );
+                
+                const submissions = await Promise.all(submissionPromises);
+                
+                // 3. Upload media files for each submission
                 if (uploadedMedia.length > 0) {
-                    document.getElementById('loadingText').textContent = 'Uploading files...';
-                    await handleFileUploads(submissionId);
+                    showLoading('Uploading media files...');
+                    await Promise.all(
+                        submissions.map(submission => 
+                            uploadMediaFiles(submission.id)
+                        )
+                    );
                 }
                 
-                // Show success
-                showSubmissionSuccess(submissionId);
+                hideLoading();
+                showSuccessPage(submissions);
                 
             } catch (error) {
-                console.error('Submission error:', error);
-                alert('Error saving your instructions. Please try again or contact support.');
-            } finally {
-                // Hide loading
-                nextBtn.disabled = false;
-                nextBtn.textContent = 'Submit';
-                loadingOverlay.style.display = 'none';
+                hideLoading();
+                console.error('Error submitting form:', error);
+                showNotification('Error submitting form. Please try again.', 'error');
             }
         }
         
-        async function saveToSupabase(formData) {
-            const { data, error } = await supabase
-                .from('instruction_submissions')
-                .insert([formData])
+        async function ensureDriverExists() {
+            const username = document.getElementById('driverUsername').value;
+            
+            // Check if driver exists
+            let { data: driver, error } = await supabase
+                .from('drivers')
+                .select('id')
+                .eq('username', username)
+                .maybeSingle();
+
+            if (!driver) {
+                // Create new driver
+                const { data: newDriver, error: createError } = await supabase
+                    .from('drivers')
+                    .insert({
+                        username: username,
+                        full_name: document.getElementById('driverName').value,
+                        region: document.getElementById('region').value
+                    })
+                    .select()
+                    .single();
+
+                if (createError) throw createError;
+                return newDriver.id;
+            }
+
+            return driver.id;
+        }
+        
+        async function createSubmissionForBranch(driverId, branch) {
+            const { data: submission, error } = await supabase
+                .from('submissions')
+                .insert({
+                    driver_id: driverId,
+                    client_id: selectedClient.id,
+                    branch_id: branch.id,
+                    instructions: document.getElementById('instructions').value,
+                    instruction_types: selectedInstructionTypes.join(', '),
+                    delivery_frequency: document.getElementById('frequency').value,
+                    challenges: document.getElementById('challenges').value,
+                    status: 'pending',
+                    priority: 'medium'
+                })
                 .select()
                 .single();
-                
-            if (error) {
-                throw new Error('Database error: ' + error.message);
-            }
-            
-            return data.id;
+
+            if (error) throw error;
+            return submission;
         }
         
-        async function saveToLocalStorage(formData) {
-            // Fallback when backend is not available
-            const submissions = JSON.parse(localStorage.getItem('driver_submissions') || '[]');
-            const submissionId = 'local_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
-            
-            const submission = {
-                id: submissionId,
-                ...formData
-            };
-            
-            submissions.push(submission);
-            localStorage.setItem('driver_submissions', JSON.stringify(submissions));
-            
-            return submissionId;
-        }
-        
-        async function handleFileUploads(submissionId) {
-            for (let i = 0; i < uploadedMedia.length; i++) {
-                const media = uploadedMedia[i];
-                
+        async function uploadMediaFiles(submissionId) {
+            for (const mediaItem of uploadedMedia) {
                 try {
-                    if (isBackendConnected && supabase && (media.blob || media.url)) {
-                        // Upload to Supabase storage
-                        const fileName = `${submissionId}/${Date.now()}_${media.name}`;
-                        const fileToUpload = media.blob || await fetch(media.url).then(r => r.blob());
-                        
-                        const { data: uploadData, error: uploadError } = await supabase.storage
-                            .from('driver-media')
-                            .upload(fileName, fileToUpload);
-                            
-                        if (uploadError) {
-                            console.error('File upload error:', uploadError);
-                            continue;
-                        }
-                        
-                        // Save file record
-                        const { error: fileError } = await supabase
-                            .from('media_attachments')
-                            .insert([{
-                                submission_id: submissionId,
-                                file_name: media.name,
-                                file_type: media.type,
-                                file_size: media.size || 0,
-                                storage_path: uploadData.path,
-                                mime_type: media.blob ? media.blob.type : 'unknown',
-                                description: media.description
-                            }]);
-                            
-                        if (fileError) {
-                            console.error('File record error:', fileError);
-                        }
-                    } else {
-                        // Store file info locally (actual files can't be stored in localStorage)
-                        const fileInfo = {
+                    // Upload file to Supabase Storage
+                    const fileName = `${submissionId}/${Date.now()}_${mediaItem.name}`;
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('submission-media')
+                        .upload(fileName, mediaItem.file);
+
+                    if (uploadError) throw uploadError;
+
+                    // Save file record to database
+                    const { error: dbError } = await supabase
+                        .from('media_files')
+                        .insert({
                             submission_id: submissionId,
-                            file_name: media.name,
-                            file_size: media.size || 0,
-                            file_type: media.type,
-                            description: media.description,
-                            stored_locally: true
-                        };
-                        
-                        const fileRecords = JSON.parse(localStorage.getItem('driver_files') || '[]');
-                        fileRecords.push(fileInfo);
-                        localStorage.setItem('driver_files', JSON.stringify(fileRecords));
-                    }
+                            file_name: mediaItem.name,
+                            file_type: mediaItem.type,
+                            file_size: mediaItem.size,
+                            storage_path: uploadData.path,
+                            description: mediaItem.description
+                        });
+
+                    if (dbError) throw dbError;
+
                 } catch (error) {
-                    console.error('Error uploading file:', media.name, error);
+                    console.error('Error uploading media:', error);
+                    showNotification(`Error uploading ${mediaItem.name}`, 'error');
                 }
             }
         }
         
-        function showSubmissionSuccess(submissionId) {
-            // Show success step
+        function showSuccessPage(submissions) {
+            const summary = document.getElementById('submissionSummary');
+            summary.innerHTML = `
+                <div>📝 Submissions created: ${submissions.length}</div>
+                <div>📸 Media files: ${uploadedMedia.length} uploaded</div>
+                <div>🏢 Branches: ${selectedBranches.map(b => b.name).join(', ')}</div>
+                <div>🏷️ Categories: ${selectedInstructionTypes.join(', ')}</div>
+            `;
+            
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('success').classList.add('active');
             document.querySelector('.navigation').style.display = 'none';
             
-            // Update success message with details
-            const summary = document.getElementById('submissionSummary');
-            const totalSize = uploadedMedia.reduce((sum, item) => sum + (item.size || 0), 0);
-            const mediaTypes = [...new Set(uploadedMedia.map(item => item.type))];
-            
-            summary.innerHTML = `
-                <div><strong>Submission ID:</strong> ${submissionId}</div>
-                <div>📝 Instructions: ${document.getElementById('instructions').value.length} characters</div>
-                <div>📸 Media files: ${uploadedMedia.length} items ${totalSize > 0 ? `(${formatFileSize(totalSize)})` : ''}</div>
-                ${mediaTypes.length > 0 ? `<div>🎬 Media types: ${mediaTypes.join(', ')}</div>` : ''}
-                <div>🏢 Branches: ${selectedBranches.length} locations</div>
-                <div>🏷️ Categories: ${selectedInstructionTypes.length} types</div>
-                <div>💾 Saved to: ${isBackendConnected ? 'Cloud Database ☁️' : 'Local Storage 💾'}</div>
-                <div style="margin-top: 15px; padding: 10px; background: #e8f5e8; border-radius: 5px; color: #2e7d32;">
-                    ✅ <strong>Thank you!</strong> Your detailed instructions will help improve delivery service quality.
-                </div>
-            `;
+            showNotification('Instructions submitted successfully!', 'success');
         }
         
         function resetForm() {
             currentStep = 1;
-            selectedClient = '';
+            selectedClient = null;
             selectedBranches = [];
             selectedInstructionTypes = [];
-            
-            // Clean up blob URLs
-            uploadedMedia.forEach(item => {
-                if (item.url && item.url.startsWith('blob:')) {
-                    URL.revokeObjectURL(item.url);
-                }
-            });
             uploadedMedia = [];
             mediaCounter = 0;
-            
-            // Stop any active camera/recording
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
-            }
-            if (isRecording) {
-                stopVideoRecording();
-            }
             
             // Clear form inputs
             document.getElementById('driverUsername').value = '';
@@ -1246,538 +1038,14 @@ Examples:
             
             // Reset selections
             document.querySelectorAll('.client-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.branch-card').forEach(card => card.classList.remove('selected'));
             document.querySelectorAll('.type-chip').forEach(chip => chip.classList.remove('selected'));
             
             showStep(1);
             document.querySelector('.navigation').style.display = 'flex';
         }
         
-        // =============================================================================
-        // CAMERA FUNCTIONALITY WITH BROWSER COMPATIBILITY
-        // =============================================================================
-        
-        async function openCamera() {
-            const cameraControls = document.getElementById('cameraControls');
-            const cameraVideo = document.getElementById('cameraVideo');
-            const cameraError = document.getElementById('cameraError');
-            const captureBtn = document.getElementById('captureBtn');
-            const recordBtn = document.getElementById('recordBtn');
-            
-            // Show browser compatibility info
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const isBrave = navigator.brave && navigator.brave.isBrave;
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            
-            try {
-                // Check if getUserMedia is supported
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    throw new Error('Camera API not supported in this browser');
-                }
-                
-                // Stop any existing stream
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-                
-                // iOS-specific constraints
-                const constraints = {
-                    video: {
-                        facingMode: currentFacingMode,
-                        width: isIOS ? { ideal: 640 } : { ideal: 1280 },
-                        height: isIOS ? { ideal: 480 } : { ideal: 720 }
-                    },
-                    audio: !isIOS // Disable audio on iOS to reduce permission complexity
-                };
-                
-                // Show loading state
-                cameraError.style.display = 'block';
-                cameraError.style.color = '#2196F3';
-                cameraError.innerHTML = `
-                    <div>Requesting camera access...</div>
-                    <div style="font-size: 12px; margin-top: 10px;">
-                        ${isBrave ? '⚠️ Brave browser detected - you may need to enable camera in Brave settings' : ''}
-                        ${isIOS ? '📱 iOS detected - make sure to allow camera access' : ''}
-                    </div>
-                `;
-                cameraControls.classList.add('active');
-                
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                cameraVideo.srcObject = currentStream;
-                
-                // Success - hide error and show controls
-                cameraError.style.display = 'none';
-                captureBtn.style.display = 'inline-block';
-                
-                // Only show video recording on non-iOS or if audio is available
-                if (!isIOS || currentStream.getAudioTracks().length > 0) {
-                    recordBtn.style.display = 'inline-block';
-                } else {
-                    recordBtn.style.display = 'none';
-                }
-                
-            } catch (error) {
-                console.error('Camera access error:', error);
-                cameraError.style.display = 'block';
-                cameraError.style.color = '#ff6b6b';
-                
-                let errorMessage = 'Camera access failed. ';
-                
-                if (error.name === 'NotAllowedError') {
-                    errorMessage += `
-                        <strong>Permission denied.</strong><br><br>
-                        ${isBrave ? 
-                            '🛡️ <strong>Brave Browser Fix:</strong><br>1. Tap the shield icon in address bar<br>2. Enable "Use Camera"<br>3. Refresh page and try again<br><br>' : 
-                            ''
-                        }
-                        ${isIOS ? 
-                            '📱 <strong>iOS Fix:</strong><br>1. Go to Settings > Privacy & Security > Camera<br>2. Enable camera for ' + (isBrave ? 'Brave' : 'your browser') + '<br>3. Refresh page and try again<br><br>' : 
-                            ''
-                        }
-                        Or try using <strong>Safari browser</strong> which works better with cameras.
-                    `;
-                } else if (error.name === 'NotFoundError') {
-                    errorMessage += 'No camera found on this device.';
-                } else if (error.name === 'NotSupportedError') {
-                    errorMessage += `
-                        Camera not supported in this browser.<br><br>
-                        <strong>Try these browsers instead:</strong><br>
-                        • Safari (recommended for iOS)<br>
-                        • Chrome<br>
-                        • Firefox
-                    `;
-                } else {
-                    errorMessage += error.message;
-                }
-                
-                // Add fallback file upload option
-                errorMessage += `
-                    <br><br>
-                    <strong>Alternative:</strong> Use the "Camera Roll" button instead to upload photos from your camera roll.
-                `;
-                
-                cameraError.innerHTML = errorMessage;
-                captureBtn.style.display = 'none';
-                recordBtn.style.display = 'none';
-            }
-        }
-        
-        function closeCamera() {
-            const cameraControls = document.getElementById('cameraControls');
-            const cameraVideo = document.getElementById('cameraVideo');
-            
-            // Stop recording if active
-            if (isRecording) {
-                stopVideoRecording();
-            }
-            
-            // Stop camera stream
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
-            }
-            
-            // Hide controls
-            cameraControls.classList.remove('active');
-            cameraVideo.srcObject = null;
-        }
-        
-        function capturePhoto() {
-            const video = document.getElementById('cameraVideo');
-            const canvas = document.getElementById('captureCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            if (!video.videoWidth || !video.videoHeight) {
-                alert('Camera not ready. Please wait a moment and try again.');
-                return;
-            }
-            
-            // Set canvas dimensions to video dimensions
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            // Draw video frame to canvas
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Convert to blob and create media item
-            canvas.toBlob((blob) => {
-                const mediaItem = {
-                    id: ++mediaCounter,
-                    type: 'image',
-                    name: `Photo_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.jpg`,
-                    blob: blob,
-                    url: URL.createObjectURL(blob),
-                    description: 'Captured photo',
-                    size: blob.size,
-                    timestamp: new Date()
-                };
-                
-                uploadedMedia.push(mediaItem);
-                addMediaToGallery(mediaItem);
-                showProcessingAnimation(mediaItem.id);
-                
-                // Close camera after capture
-                closeCamera();
-                
-                // Show success message
-                alert('Photo captured successfully!');
-                
-            }, 'image/jpeg', 0.8);
-        }
-        
-        async function toggleVideoRecording() {
-            if (isRecording) {
-                stopVideoRecording();
-            } else {
-                startVideoRecording();
-            }
-        }
-        
-        function startVideoRecording() {
-            if (!currentStream) {
-                alert('Camera not available');
-                return;
-            }
-            
-            try {
-                recordedChunks = [];
-                
-                // Create media recorder
-                const options = {
-                    mimeType: 'video/webm; codecs=vp9',
-                };
-                
-                // Fallback for different browsers
-                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                    options.mimeType = 'video/webm; codecs=vp8';
-                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                        options.mimeType = 'video/webm';
-                        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                            options.mimeType = '';
-                        }
-                    }
-                }
-                
-                mediaRecorder = new MediaRecorder(currentStream, options);
-                
-                mediaRecorder.addEventListener('dataavailable', (event) => {
-                    if (event.data.size > 0) {
-                        recordedChunks.push(event.data);
-                    }
-                });
-                
-                mediaRecorder.addEventListener('stop', () => {
-                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const duration = Math.round((Date.now() - recordingStartTime) / 1000);
-                    
-                    const mediaItem = {
-                        id: ++mediaCounter,
-                        type: 'video',
-                        name: `Video_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.webm`,
-                        blob: blob,
-                        url: URL.createObjectURL(blob),
-                        description: 'Recorded video',
-                        size: blob.size,
-                        duration: duration,
-                        timestamp: new Date()
-                    };
-                    
-                    uploadedMedia.push(mediaItem);
-                    addMediaToGallery(mediaItem);
-                    showProcessingAnimation(mediaItem.id);
-                    
-                    alert(`Video recorded successfully! Duration: ${duration} seconds`);
-                });
-                
-                // Start recording
-                mediaRecorder.start();
-                isRecording = true;
-                recordingStartTime = Date.now();
-                
-                // Update UI
-                const recordBtn = document.getElementById('recordBtn');
-                const recordingIndicator = document.getElementById('recordingIndicator');
-                const recordingTimerEl = document.getElementById('recordingTimer');
-                
-                recordBtn.textContent = '⏹️ Stop';
-                recordBtn.classList.add('recording');
-                recordingIndicator.classList.add('active');
-                recordingTimerEl.classList.add('active');
-                
-                // Start timer
-                recordingTimer = setInterval(updateRecordingTimer, 1000);
-                
-                // Auto-stop after 5 minutes
-                setTimeout(() => {
-                    if (isRecording) {
-                        stopVideoRecording();
-                    }
-                }, 5 * 60 * 1000);
-                
-            } catch (error) {
-                console.error('Recording error:', error);
-                alert('Error starting video recording: ' + error.message);
-            }
-        }
-        
-        function stopVideoRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                
-                // Update UI
-                const recordBtn = document.getElementById('recordBtn');
-                const recordingIndicator = document.getElementById('recordingIndicator');
-                const recordingTimerEl = document.getElementById('recordingTimer');
-                
-                recordBtn.textContent = '🎥 Record';
-                recordBtn.classList.remove('recording');
-                recordingIndicator.classList.remove('active');
-                recordingTimerEl.classList.remove('active');
-                
-                // Clear timer
-                if (recordingTimer) {
-                    clearInterval(recordingTimer);
-                    recordingTimer = null;
-                }
-                
-                // Close camera
-                closeCamera();
-            }
-        }
-        
-        function updateRecordingTimer() {
-            if (isRecording && recordingStartTime) {
-                const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
-                const minutes = Math.floor(elapsed / 60);
-                const seconds = elapsed % 60;
-                const recordingTimerEl = document.getElementById('recordingTimer');
-                recordingTimerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-        }
-        
-        async function switchCamera() {
-            // Toggle between front and back camera
-            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-            
-            // Restart camera with new facing mode
-            if (currentStream) {
-                await openCamera();
-            }
-        }
-        
-        function startVideoRecord() {
-            // Open camera in video mode
-            openCamera();
-        }
-        
-        // =============================================================================
-        // FILE UPLOAD HANDLING
-        // =============================================================================
-        
-        function handleFileUpload(files) {
-            Array.from(files).forEach(file => {
-                const mediaItem = {
-                    id: ++mediaCounter,
-                    type: 'document',
-                    name: file.name,
-                    size: file.size,
-                    url: null,
-                    description: 'Uploaded document',
-                    file: file
-                };
-                
-                uploadedMedia.push(mediaItem);
-                addMediaToGallery(mediaItem);
-                showProcessingAnimation(mediaItem.id);
-            });
-        }
-        
-        function handleImageUpload(files) {
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const isVideo = file.type.startsWith('video/');
-                    const mediaItem = {
-                        id: ++mediaCounter,
-                        type: isVideo ? 'video' : 'image',
-                        name: file.name,
-                        size: file.size,
-                        url: e.target.result,
-                        description: isVideo ? 'Uploaded video' : 'Uploaded image',
-                        duration: isVideo ? 'Unknown' : undefined,
-                        file: file
-                    };
-                    
-                    uploadedMedia.push(mediaItem);
-                    addMediaToGallery(mediaItem);
-                    showProcessingAnimation(mediaItem.id);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        // =============================================================================
-        // MEDIA GALLERY MANAGEMENT
-        // =============================================================================
-        
-        function addMediaToGallery(mediaItem) {
-            const gallery = document.getElementById('mediaGallery');
-            const mediaElement = document.createElement('div');
-            mediaElement.className = 'media-item';
-            mediaElement.dataset.id = mediaItem.id;
-            
-            let previewContent = '';
-            if (mediaItem.type === 'image') {
-                previewContent = mediaItem.url ? 
-                    `<img src="${mediaItem.url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;">` :
-                    '<div class="media-preview">📷</div>';
-            } else if (mediaItem.type === 'video') {
-                if (mediaItem.url) {
-                    previewContent = `
-                        <div class="media-preview video" style="position: relative;">
-                            <video src="${mediaItem.url}" style="width: 100%; height: 120px; object-fit: cover;" muted></video>
-                            <div class="play-icon" onclick="playVideo('${mediaItem.url}', '${mediaItem.name}')" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 30px; color: white; cursor: pointer;">▶️</div>
-                        </div>`;
-                } else {
-                    previewContent = '<div class="media-preview video">🎥<div class="play-icon">▶️</div></div>';
-                }
-            } else {
-                previewContent = '<div class="media-preview">📄</div>';
-            }
-            
-            const sizeInfo = mediaItem.size ? ` (${formatFileSize(mediaItem.size)})` : '';
-            const durationInfo = mediaItem.duration ? ` - ${mediaItem.duration}s` : '';
-            
-            mediaElement.innerHTML = `
-                ${previewContent}
-                <button class="remove-btn" onclick="removeMedia(${mediaItem.id})">×</button>
-                <div class="media-description">
-                    <input type="text" placeholder="Add description..." value="${mediaItem.description}" onchange="updateDescription(${mediaItem.id}, this.value)">
-                    <div style="font-size: 10px; color: #999; margin-top: 2px;">${mediaItem.name}${sizeInfo}${durationInfo}</div>
-                </div>
-            `;
-            
-            gallery.appendChild(mediaElement);
-        }
-        
-        function playVideo(videoUrl, videoName) {
-            // Create a modal to play the video
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.9);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
-            
-            modal.innerHTML = `
-                <div style="max-width: 90%; max-height: 90%; position: relative;">
-                    <video controls autoplay style="width: 100%; height: auto; max-height: 80vh;">
-                        <source src="${videoUrl}" type="video/webm">
-                        Your browser doesn't support video playback.
-                    </video>
-                    <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: -40px; right: 0; background: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;">Close ×</button>
-                    <div style="color: white; text-align: center; margin-top: 10px;">${videoName}</div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Close on background click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-        }
-        
-        function removeMedia(mediaId) {
-            const mediaItem = uploadedMedia.find(item => item.id === mediaId);
-            if (mediaItem && mediaItem.url && mediaItem.url.startsWith('blob:')) {
-                // Clean up blob URL to prevent memory leaks
-                URL.revokeObjectURL(mediaItem.url);
-            }
-            
-            uploadedMedia = uploadedMedia.filter(item => item.id !== mediaId);
-            const mediaElement = document.querySelector(`[data-id="${mediaId}"]`);
-            if (mediaElement) {
-                mediaElement.remove();
-            }
-        }
-        
-        function updateDescription(mediaId, description) {
-            const mediaItem = uploadedMedia.find(item => item.id === mediaId);
-            if (mediaItem) {
-                mediaItem.description = description;
-            }
-        }
-        
-        function showProcessingAnimation(mediaId) {
-            const mediaElement = document.querySelector(`[data-id="${mediaId}"]`);
-            if (mediaElement) {
-                const processingDiv = document.createElement('div');
-                processingDiv.className = 'processing-indicator';
-                processingDiv.innerHTML = `
-                    <div class="spinner"></div>
-                    <div>Processing...</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%"></div>
-                    </div>
-                `;
-                mediaElement.appendChild(processingDiv);
-                
-                // Simulate processing progress
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += 10;
-                    const progressBar = processingDiv.querySelector('.progress-fill');
-                    progressBar.style.width = progress + '%';
-                    
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        setTimeout(() => {
-                            processingDiv.remove();
-                        }, 500);
-                    }
-                }, 200);
-            }
-        }
-        
-        // =============================================================================
-        // UTILITY FUNCTIONS
-        // =============================================================================
-        
-        function generateSessionId() {
-            return 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
-        }
-        
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        // =============================================================================
-        // EVENT LISTENERS
-        // =============================================================================
-        
-        // Event listeners for client and branch selection
-        document.querySelectorAll('.client-card').forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.client-card').forEach(c => c.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedClient = this.dataset.client;
-            });
-        });
-        
+        // Instruction type selection
         document.querySelectorAll('.type-chip').forEach(chip => {
             chip.addEventListener('click', function() {
                 const type = this.dataset.type;
@@ -1791,65 +1059,36 @@ Examples:
             });
         });
         
-        // Cleanup on page unload to prevent memory leaks
-        window.addEventListener('beforeunload', () => {
-            // Stop camera
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-            
-            // Clean up blob URLs
-            uploadedMedia.forEach(item => {
-                if (item.url && item.url.startsWith('blob:')) {
-                    URL.revokeObjectURL(item.url);
-                }
-            });
-        });
+        // Utility functions
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
         
-        // Check for camera support and browser compatibility on load
-        window.addEventListener('load', () => {
-            // Browser detection
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const isBrave = navigator.brave && navigator.brave.isBrave;
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            const isChrome = /chrome/i.test(navigator.userAgent) && !/edg/i.test(navigator.userAgent);
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
             
-            const browserWarning = document.getElementById('browserWarning');
-            const browserWarningText = document.getElementById('browserWarningText');
+            document.body.appendChild(notification);
             
-            // Show warnings for problematic browser combinations
-            if (isBrave && isIOS) {
-                browserWarning.style.display = 'block';
-                browserWarningText.innerHTML = `
-                    You're using <strong>Brave on iOS</strong> which often blocks camera access for privacy.<br>
-                    <strong>Recommended:</strong> Use Safari browser for best camera functionality, or use the "Camera Roll" button to upload photos instead.
-                `;
-            } else if (isBrave) {
-                browserWarning.style.display = 'block';
-                browserWarningText.innerHTML = `
-                    You're using <strong>Brave browser</strong> which has strict privacy settings.<br>
-                    If camera doesn't work, click the shield icon in the address bar and enable camera access.
-                `;
-            } else if (isIOS && !isSafari) {
-                browserWarning.style.display = 'block';
-                browserWarningText.innerHTML = `
-                    For best camera functionality on iOS, we recommend using <strong>Safari browser</strong>.<br>
-                    Current browser may have limited camera support.
-                `;
-            }
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
             
-            // Check if camera API is supported
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                console.warn('Camera API not supported in this browser');
-                if (browserWarning.style.display === 'none') {
-                    browserWarning.style.display = 'block';
-                    browserWarningText.innerHTML = `
-                        <strong>Camera not supported</strong> in this browser.<br>
-                        Please use the "Camera Roll" and "Upload Document" buttons instead.
-                    `;
-                }
-            }
-        });
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
     </script>
 </body>
 </html>
