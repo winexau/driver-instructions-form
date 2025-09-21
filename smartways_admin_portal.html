@@ -1223,49 +1223,82 @@
             try {
                 showNotification('Loading submissions from database...', 'info');
                 
-                const { data, error } = await supabase
+                // First, get submissions
+                const { data: submissions, error: submissionsError } = await supabase
                     .from('submissions')
-                    .select(`
-                        *,
-                        drivers(username, full_name, region),
-                        clients(name, client_code),
-                        branches(name),
-                        media_files(file_name, file_type, file_size)
-                    `)
+                    .select('*')
                     .order('submitted_at', { ascending: false });
 
-                if (error) throw error;
+                if (submissionsError) {
+                    console.error('Submissions query error:', submissionsError);
+                    throw submissionsError;
+                }
 
-                submissionsData = data.map(item => ({
-                    id: item.id,
-                    driver: item.drivers?.full_name || 'Unknown Driver',
-                    driverUsername: item.drivers?.username || '',
-                    driverRegion: item.drivers?.region || '',
-                    client: `${item.clients?.name || 'Unknown'} - ${item.branches?.name || 'Unknown'}`,
-                    clientCode: item.clients?.client_code || '',
-                    branch: item.branches?.name || '',
-                    submitted: new Date(item.submitted_at).toLocaleString(),
-                    lastModified: new Date(item.updated_at).toLocaleString(),
-                    status: item.status,
-                    priority: item.priority,
-                    mediaCount: item.media_files?.length || 0,
-                    mediaTypes: [...new Set((item.media_files || []).map(f => f.file_type))].join(', '),
-                    mediaSize: formatFileSize((item.media_files || []).reduce((sum, f) => sum + (f.file_size || 0), 0)),
-                    instructions: item.instructions,
-                    instructionType: item.instruction_types,
-                    frequency: item.delivery_frequency,
-                    challenges: item.challenges,
-                    reviewedBy: item.reviewed_by,
-                    reviewNotes: item.review_notes,
-                    media_files: item.media_files || []
-                }));
+                console.log('Raw submissions from database:', submissions);
+
+                // Get related data separately to avoid complex joins
+                const [driversData, clientsData, branchesData, mediaData] = await Promise.all([
+                    supabase.from('drivers').select('*'),
+                    supabase.from('clients').select('*'),
+                    supabase.from('branches').select('*'),
+                    supabase.from('media_files').select('*')
+                ]);
+
+                // Create lookup maps
+                const driversMap = new Map((driversData.data || []).map(d => [d.id, d]));
+                const clientsMap = new Map((clientsData.data || []).map(c => [c.id, c]));
+                const branchesMap = new Map((branchesData.data || []).map(b => [b.id, b]));
+                
+                // Group media files by submission
+                const mediaBySubmission = {};
+                (mediaData.data || []).forEach(media => {
+                    if (!mediaBySubmission[media.submission_id]) {
+                        mediaBySubmission[media.submission_id] = [];
+                    }
+                    mediaBySubmission[media.submission_id].push(media);
+                });
+
+                // Map submissions with related data
+                submissionsData = submissions.map(item => {
+                    const driver = driversMap.get(item.driver_id) || {};
+                    const client = clientsMap.get(item.client_id) || {};
+                    const branch = branchesMap.get(item.branch_id) || {};
+                    const mediaFiles = mediaBySubmission[item.id] || [];
+
+                    return {
+                        id: item.id,
+                        driver: driver.full_name || 'Unknown Driver',
+                        driverUsername: driver.username || '',
+                        driverRegion: driver.region || '',
+                        client: `${client.name || 'Unknown'} - ${branch.name || 'Unknown'}`,
+                        clientCode: client.client_code || '',
+                        branch: branch.name || '',
+                        submitted: new Date(item.submitted_at).toLocaleString(),
+                        lastModified: new Date(item.updated_at).toLocaleString(),
+                        status: item.status,
+                        priority: item.priority,
+                        mediaCount: mediaFiles.length,
+                        mediaTypes: [...new Set(mediaFiles.map(f => f.file_type))].join(', ') || 'None',
+                        mediaSize: formatFileSize(mediaFiles.reduce((sum, f) => sum + (f.file_size || 0), 0)),
+                        instructions: item.instructions,
+                        instructionType: item.instruction_types,
+                        frequency: item.delivery_frequency,
+                        challenges: item.challenges,
+                        reviewedBy: item.reviewed_by,
+                        reviewNotes: item.review_notes,
+                        media_files: mediaFiles
+                    };
+                });
+
+                console.log('Processed submissions data:', submissionsData);
 
                 loadSubmissionsTable();
                 showNotification(`Loaded ${submissionsData.length} submissions successfully`, 'success');
                 
             } catch (error) {
                 console.error('Error loading submissions:', error);
-                showNotification('Error loading data from database. Using sample data.', 'error');
+                console.error('Error details:', error.message, error.details, error.hint);
+                showNotification(`Database error: ${error.message}. Using sample data.`, 'error');
                 
                 // Fallback to sample data if database fails
                 loadSampleData();
