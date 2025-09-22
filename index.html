@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smartways Driver Instructions Portal v14</title>
+    <title>Smartways Driver Instructions Portal</title>
     <style>
         * {
             margin: 0;
@@ -15,7 +15,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 10px;
+            padding: 20px;
         }
         
         .container {
@@ -35,7 +35,7 @@
         }
         
         .header h1 {
-            font-size: 26px;
+            font-size: 28px;
             margin-bottom: 10px;
         }
         
@@ -44,46 +44,19 @@
             font-size: 14px;
         }
         
-        .form-section {
+        .login-section {
             padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
         }
         
-        .step {
+        .main-form {
+            padding: 30px;
             display: none;
-            animation: fadeIn 0.3s ease-in;
         }
         
-        .step.active {
+        .main-form.active {
             display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-            gap: 10px;
-        }
-        
-        .step-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #ddd;
-            transition: all 0.3s ease;
-        }
-        
-        .step-dot.active {
-            background: #2196F3;
-            transform: scale(1.2);
-        }
-        
-        .step-dot.completed {
-            background: #4CAF50;
         }
         
         .form-group {
@@ -107,8 +80,8 @@
             padding: 12px 15px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
+            font-size: 15px;
+            transition: all 0.3s ease;
             background: white;
         }
         
@@ -118,11 +91,135 @@
             box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         }
         
-        .autocomplete-wrapper {
-            position: relative;
+        textarea {
+            resize: vertical;
+            min-height: 100px;
         }
         
-        .autocomplete-input {
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976D2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #388E3C;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .branches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .branch-card {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: white;
+        }
+        
+        .branch-card:hover {
+            border-color: #2196F3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .branch-card.selected {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+        
+        .branch-card .branch-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .branch-card .branch-info {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .location-type-toggle {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .toggle-option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .toggle-option:hover {
+            border-color: #2196F3;
+        }
+        
+        .toggle-option.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        
+        .toggle-option .icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .autocomplete-wrapper {
             position: relative;
         }
         
@@ -160,45 +257,21 @@
         
         .autocomplete-item.selected {
             background: #e3f2fd;
-            font-weight: 500;
         }
         
-        .autocomplete-item .highlight {
+        .highlight {
             background: #ffeb3b;
             font-weight: 600;
         }
         
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #2196F3;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .instruction-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
+        .instruction-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 20px;
         }
         
-        .instruction-type {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .type-chip {
+        .category-chip {
             padding: 8px 16px;
             background: white;
             border: 2px solid #e1e5e9;
@@ -208,12 +281,12 @@
             font-size: 14px;
         }
         
-        .type-chip:hover {
+        .category-chip:hover {
             border-color: #2196F3;
             transform: translateY(-1px);
         }
         
-        .type-chip.selected {
+        .category-chip.selected {
             background: #2196F3;
             color: white;
             border-color: #2196F3;
@@ -234,15 +307,16 @@
             border-color: #1976D2;
         }
         
-        .upload-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        .upload-buttons {
+            display: flex;
+            justify-content: center;
             gap: 15px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         
         .upload-btn {
-            padding: 15px 20px;
+            padding: 12px 20px;
             border: 2px solid #2196F3;
             background: white;
             color: #2196F3;
@@ -251,7 +325,6 @@
             transition: all 0.3s ease;
             font-weight: 600;
             display: flex;
-            flex-direction: column;
             align-items: center;
             gap: 8px;
         }
@@ -262,8 +335,8 @@
             transform: translateY(-2px);
         }
         
-        .upload-btn i {
-            font-size: 24px;
+        .file-input {
+            display: none;
         }
         
         .media-gallery {
@@ -290,7 +363,6 @@
         .media-preview {
             width: 100%;
             height: 120px;
-            object-fit: cover;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -328,75 +400,23 @@
         .media-description {
             padding: 8px;
             font-size: 12px;
-            color: #666;
-            border-top: 1px solid #e1e5e9;
-        }
-        
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-            font-weight: 600;
-        }
-        
-        .btn-primary {
-            background: #2196F3;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #1976D2;
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #545b62;
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            padding-top: 20px;
+            background: white;
             border-top: 1px solid #e1e5e9;
         }
         
         .success-message {
+            display: none;
             text-align: center;
             padding: 40px;
+        }
+        
+        .success-message.active {
+            display: block;
         }
         
         .success-icon {
             font-size: 72px;
             margin-bottom: 20px;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .error-message {
-            background: #ffebee;
-            color: #c62828;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 14px;
         }
         
         .info-box {
@@ -409,31 +429,66 @@
             color: #0d47a1;
         }
         
-        .timing-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            border-left: 4px solid #f44336;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .driver-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .driver-info strong {
+            color: #2196F3;
         }
         
         @media (max-width: 768px) {
             .container {
-                margin: 5px;
+                margin: 0;
+                border-radius: 0;
             }
             
-            .form-section {
-                padding: 20px;
-            }
-            
-            .upload-options {
+            .branches-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .location-type-toggle {
+                flex-direction: column;
+            }
+            
+            .upload-buttons {
+                flex-direction: column;
             }
             
             .media-gallery {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
-            
-            .timing-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -441,209 +496,141 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📋 Smartways Driver Instructions Portal</h1>
-            <p>Capture and share delivery instructions with your team</p>
+            <h1>📋 Driver Instructions Portal</h1>
+            <p>Add delivery instructions for your routes</p>
         </div>
         
-        <div class="form-section">
-            <div class="step-indicator">
-                <div class="step-dot active"></div>
-                <div class="step-dot"></div>
-                <div class="step-dot"></div>
-                <div class="step-dot"></div>
-                <div class="step-dot"></div>
+        <!-- Login Section -->
+        <div class="login-section" id="loginSection">
+            <div class="form-group">
+                <label for="driverUsername">Driver Username <span class="required">*</span></label>
+                <input type="text" id="driverUsername" placeholder="Enter your driver username (e.g., NSW_Theo)">
+            </div>
+            <button class="btn btn-primary" onclick="loginDriver()">
+                🚀 Login & View My Branches
+            </button>
+            <div class="error-message" id="loginError"></div>
+        </div>
+        
+        <!-- Main Form (Hidden until login) -->
+        <div class="main-form" id="mainForm">
+            <!-- Driver Info Display -->
+            <div class="driver-info" id="driverInfo">
+                <div>Logged in as: <strong id="driverDisplay"></strong></div>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
             </div>
             
-            <!-- Step 1: Driver Information -->
-            <div class="step active" id="step1">
-                <h2 style="margin-bottom: 20px;">Driver Information</h2>
-                <div class="form-group">
-                    <label for="driverUsername">Driver ID/Username <span class="required">*</span></label>
-                    <input type="text" id="driverUsername" placeholder="Enter your driver ID (e.g., NSW_Theo)" required>
-                </div>
-                <div class="form-group">
-                    <label for="driverName">Full Name <span class="required">*</span></label>
-                    <input type="text" id="driverName" placeholder="Enter your full name" required>
-                </div>
-                <div class="form-group">
-                    <label for="driverEmail">Email Address</label>
-                    <input type="email" id="driverEmail" placeholder="your.email@smartways.com.au">
-                </div>
-                <div class="form-group">
-                    <label for="driverPhone">Phone Number</label>
-                    <input type="tel" id="driverPhone" placeholder="04XX XXX XXX">
-                </div>
-                <div class="form-group">
-                    <label for="region">Primary Region <span class="required">*</span></label>
-                    <select id="region" required>
-                        <option value="">Select your region</option>
-                        <option value="NSW">New South Wales</option>
-                        <option value="VIC">Victoria</option>
-                        <option value="QLD">Queensland</option>
-                        <option value="WA">Western Australia</option>
-                        <option value="SA">South Australia</option>
-                        <option value="TAS">Tasmania</option>
-                        <option value="ACT">Australian Capital Territory</option>
-                        <option value="NT">Northern Territory</option>
-                    </select>
+            <!-- Branch Selection -->
+            <div class="form-group">
+                <label>Select Branch <span class="required">*</span></label>
+                <div class="branches-grid" id="branchesGrid">
+                    <!-- Branches will be populated here -->
                 </div>
             </div>
             
-            <!-- Step 2: Location Selection -->
-            <div class="step" id="step2">
-                <h2 style="margin-bottom: 20px;">Location Details</h2>
-                
-                <div class="form-group">
-                    <label for="branch">Branch <span class="required">*</span></label>
-                    <div class="autocomplete-wrapper">
-                        <input type="text" id="branch" placeholder="Start typing to search branches..." required>
-                        <div class="autocomplete-dropdown" id="branchDropdown"></div>
-                    </div>
+            <!-- Location Type Toggle -->
+            <div class="location-type-toggle">
+                <div class="toggle-option active" onclick="toggleLocationType('pickup')" id="pickupToggle">
+                    <div class="icon">📦</div>
+                    <div>Pickup Location</div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="pickupLocation">Pickup Location <span class="required">*</span></label>
-                    <div class="autocomplete-wrapper">
-                        <input type="text" id="pickupLocation" placeholder="Start typing to search pickup locations..." required>
-                        <div class="autocomplete-dropdown" id="pickupDropdown"></div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="deliveryLocation">Delivery Location <span class="required">*</span></label>
-                    <div class="autocomplete-wrapper">
-                        <input type="text" id="deliveryLocation" placeholder="Start typing to search delivery locations..." required>
-                        <div class="autocomplete-dropdown" id="deliveryDropdown"></div>
-                    </div>
-                </div>
-                
-                <div class="info-box">
-                    💡 <strong>Tip:</strong> Start typing the location name and select from the dropdown. If you can't find a location, you can type it manually.
+                <div class="toggle-option" onclick="toggleLocationType('delivery')" id="deliveryToggle">
+                    <div class="icon">🚚</div>
+                    <div>Delivery Location</div>
                 </div>
             </div>
             
-            <!-- Step 3: Instruction Details -->
-            <div class="step" id="step3">
-                <h2 style="margin-bottom: 20px;">Delivery Instructions</h2>
-                
-                <div class="instruction-section">
-                    <h3 style="margin-bottom: 15px;">Instruction Categories</h3>
-                    <div class="instruction-type">
-                        <div class="type-chip" data-type="access">🔑 Access</div>
-                        <div class="type-chip" data-type="delivery">📦 Delivery</div>
-                        <div class="type-chip" data-type="contact">📞 Contact</div>
-                        <div class="type-chip" data-type="timing">⏰ Timing</div>
-                        <div class="type-chip" data-type="safety">⚠️ Safety</div>
-                        <div class="type-chip" data-type="special">⭐ Special</div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="accessInstructions">Access Instructions</label>
-                    <textarea id="accessInstructions" rows="3" placeholder="e.g., Use loading dock entrance, keypad code 1234#, call security on arrival"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="deliveryProcedure">Delivery Procedure</label>
-                    <textarea id="deliveryProcedure" rows="3" placeholder="e.g., Leave packages at reception desk, use freight elevator, stack pallets in designated area"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactInfo">Site Contact Information</label>
-                    <textarea id="contactInfo" rows="2" placeholder="e.g., Contact: John Smith - 0412 345 678, Reception: 02 9XXX XXXX"></textarea>
-                </div>
-                
-                <div class="timing-grid">
-                    <div class="form-group">
-                        <label for="preferredTimeFrom">Preferred Delivery From</label>
-                        <input type="time" id="preferredTimeFrom">
-                    </div>
-                    <div class="form-group">
-                        <label for="preferredTimeTo">Preferred Delivery To</label>
-                        <input type="time" id="preferredTimeTo">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="specialHandling">Special Handling Requirements</label>
-                    <textarea id="specialHandling" rows="3" placeholder="e.g., Fragile equipment, temperature-sensitive items, requires signature"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="frequency">Delivery Frequency <span class="required">*</span></label>
-                    <select id="frequency" required>
-                        <option value="">Select frequency</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="biweekly">Bi-weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="on-demand">On Demand</option>
-                    </select>
+            <!-- Location Selection -->
+            <div class="form-group">
+                <label for="locationInput"><span id="locationLabel">Pickup</span> Location <span class="required">*</span></label>
+                <div class="autocomplete-wrapper">
+                    <input type="text" id="locationInput" placeholder="Start typing to search locations...">
+                    <div class="autocomplete-dropdown" id="locationDropdown"></div>
                 </div>
             </div>
             
-            <!-- Step 4: Media Upload -->
-            <div class="step" id="step4">
-                <h2 style="margin-bottom: 20px;">Visual Instructions</h2>
-                
-                <div class="media-upload-section">
-                    <h3 style="margin-bottom: 15px; color: #2196F3;">📸 Add Photos & Documents</h3>
-                    <p style="color: #666; margin-bottom: 20px;">Visual aids help other drivers understand complex locations</p>
-                    
-                    <div class="upload-options">
-                        <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
-                            🖼️
-                            <span>Upload Photos</span>
-                        </button>
-                        <button class="upload-btn" onclick="document.getElementById('docInput').click()">
-                            📄
-                            <span>Upload Documents</span>
-                        </button>
-                    </div>
-                    
-                    <input type="file" id="imageInput" class="file-input" accept="image/*" multiple onchange="handleImageUpload(this.files)">
-                    <input type="file" id="docInput" class="file-input" accept=".pdf,.doc,.docx" multiple onchange="handleDocUpload(this.files)">
-                </div>
-                
-                <div class="media-gallery" id="mediaGallery"></div>
-                
-                <div class="info-box">
-                    💡 <strong>Recommended uploads:</strong>
-                    <br>• Photos of entrance, loading dock, keypad, signage
-                    <br>• Site maps or floor plans
-                    <br>• Delivery procedure documents
+            <!-- Instruction Categories -->
+            <div class="form-group">
+                <label>Instruction Categories</label>
+                <div class="instruction-categories">
+                    <div class="category-chip" data-category="access">🔑 Access</div>
+                    <div class="category-chip" data-category="loading">📦 Loading/Unloading</div>
+                    <div class="category-chip" data-category="parking">🅿️ Parking</div>
+                    <div class="category-chip" data-category="contact">📞 Contact</div>
+                    <div class="category-chip" data-category="safety">⚠️ Safety</div>
+                    <div class="category-chip" data-category="timing">⏰ Timing</div>
+                    <div class="category-chip" data-category="special">⭐ Special</div>
                 </div>
             </div>
             
-            <!-- Step 5: Review & Submit -->
-            <div class="step" id="step5">
-                <h2 style="margin-bottom: 20px;">Review & Submit</h2>
-                <div id="reviewContent"></div>
+            <!-- Delivery Instructions -->
+            <div class="form-group">
+                <label for="instructions">Delivery Instructions <span class="required">*</span></label>
+                <textarea id="instructions" placeholder="Enter detailed delivery instructions...
+
+Examples:
+• Use loading dock entrance at rear of building
+• Security code: 1234# for gate access
+• Call John on 0412 345 678 before arrival
+• Park in designated bay 3
+• Fragile equipment - use trolley only"></textarea>
+            </div>
+            
+            <!-- Delivery Frequency -->
+            <div class="form-group">
+                <label for="frequency">Delivery Frequency <span class="required">*</span></label>
+                <select id="frequency">
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="fortnightly">Fortnightly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="on-demand">On Demand</option>
+                </select>
+            </div>
+            
+            <!-- Media Upload Section -->
+            <div class="media-upload-section">
+                <h3 style="margin-bottom: 10px; color: #2196F3;">📸 Visual Instructions</h3>
+                <p style="color: #666; font-size: 14px;">Add photos, videos, or documents to help other drivers</p>
                 
-                <div class="form-group">
-                    <label for="additionalNotes">Additional Notes</label>
-                    <textarea id="additionalNotes" rows="3" placeholder="Any other information that might be helpful..."></textarea>
+                <div class="upload-buttons">
+                    <button class="upload-btn" onclick="document.getElementById('photoInput').click()">
+                        📷 Add Photos
+                    </button>
+                    <button class="upload-btn" onclick="document.getElementById('videoInput').click()">
+                        🎥 Add Videos
+                    </button>
+                    <button class="upload-btn" onclick="document.getElementById('docInput').click()">
+                        📄 Add Documents
+                    </button>
                 </div>
+                
+                <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="handleFileUpload(this.files, 'photo')">
+                <input type="file" id="videoInput" class="file-input" accept="video/*" multiple onchange="handleFileUpload(this.files, 'video')">
+                <input type="file" id="docInput" class="file-input" accept=".pdf,.doc,.docx" multiple onchange="handleFileUpload(this.files, 'document')">
             </div>
             
-            <!-- Success Step -->
-            <div class="step" id="success">
-                <div class="success-message">
-                    <div class="success-icon">✅</div>
-                    <h2>Instructions Submitted Successfully!</h2>
-                    <p style="margin: 20px 0; color: #666;">Thank you for providing detailed delivery instructions. This information will help improve our service quality.</p>
-                    <div id="submissionSummary" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;"></div>
-                    <button class="btn btn-primary" onclick="resetForm()">Submit Another Entry</button>
-                </div>
-            </div>
+            <!-- Media Gallery -->
+            <div class="media-gallery" id="mediaGallery"></div>
             
-            <div class="navigation">
-                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">← Previous</button>
-                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next →</button>
+            <!-- Submit Button -->
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn btn-success" onclick="submitInstructions()" id="submitBtn">
+                    ✅ Submit Instructions
+                </button>
             </div>
         </div>
+        
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✅</div>
+            <h2>Instructions Submitted Successfully!</h2>
+            <p style="margin: 20px 0; color: #666;">Your instructions have been saved and will help other drivers.</p>
+            <button class="btn btn-primary" onclick="resetForm()">Add Another Instruction</button>
+        </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Initialize Supabase - REPLACE WITH YOUR ACTUAL CREDENTIALS
@@ -652,335 +639,370 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Global variables
-        let currentStep = 1;
-        let selectedInstructionTypes = [];
+        let currentDriver = null;
+        let driverBranches = [];
+        let selectedBranch = null;
+        let selectedLocationType = 'pickup';
+        let selectedCategories = [];
         let uploadedMedia = [];
         let mediaCounter = 0;
         let locations = {
-            branches: [],
-            pickupLocations: [],
-            deliveryLocations: []
+            pickup: [],
+            delivery: []
         };
         
-        // Load locations from Supabase on page load
-        async function loadLocations() {
+        // Login driver
+        async function loginDriver() {
+            const username = document.getElementById('driverUsername').value.trim();
+            
+            if (!username) {
+                showError('loginError', 'Please enter your username');
+                return;
+            }
+            
             try {
-                // Load branches
-                const { data: branchData, error: branchError } = await supabase
+                // Check if driver exists
+                let { data: driver, error } = await supabase
+                    .from('drivers')
+                    .select('*')
+                    .eq('username', username)
+                    .single();
+                
+                if (error || !driver) {
+                    // Create new driver if doesn't exist
+                    const { data: newDriver, error: createError } = await supabase
+                        .from('drivers')
+                        .insert([{ 
+                            username: username,
+                            full_name: username 
+                        }])
+                        .select()
+                        .single();
+                    
+                    if (createError) throw createError;
+                    driver = newDriver;
+                }
+                
+                currentDriver = driver;
+                
+                // Load branches associated with this driver
+                await loadDriverBranches();
+                
+                // Show main form
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('mainForm').classList.add('active');
+                document.getElementById('driverDisplay').textContent = driver.username;
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('loginError', 'Error logging in. Please try again.');
+            }
+        }
+        
+        // Load branches for the driver (based on their delivery history)
+        async function loadDriverBranches() {
+            try {
+                // For now, load all branches (you can filter by driver's region or history)
+                const { data: branches, error } = await supabase
                     .from('branches')
                     .select('*')
                     .order('name');
                 
-                if (!branchError && branchData) {
-                    locations.branches = branchData;
-                }
+                if (error) throw error;
                 
+                driverBranches = branches || [];
+                displayBranches();
+                
+            } catch (error) {
+                console.error('Error loading branches:', error);
+                driverBranches = [];
+            }
+        }
+        
+        // Display branches
+        function displayBranches() {
+            const grid = document.getElementById('branchesGrid');
+            
+            if (driverBranches.length === 0) {
+                grid.innerHTML = '<p style="color: #666;">No branches available. Contact admin to assign branches.</p>';
+                return;
+            }
+            
+            grid.innerHTML = driverBranches.map(branch => `
+                <div class="branch-card" onclick="selectBranch('${branch.id}', '${branch.name}')" data-branch-id="${branch.id}">
+                    <div class="branch-name">${branch.name}</div>
+                    <div class="branch-info">Click to select</div>
+                </div>
+            `).join('');
+        }
+        
+        // Select branch
+        async function selectBranch(branchId, branchName) {
+            // Update UI
+            document.querySelectorAll('.branch-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-branch-id="${branchId}"]`).classList.add('selected');
+            
+            selectedBranch = { id: branchId, name: branchName };
+            
+            // Load locations for this branch
+            await loadBranchLocations(branchId);
+            
+            // Clear location input
+            document.getElementById('locationInput').value = '';
+        }
+        
+        // Load locations for selected branch
+        async function loadBranchLocations(branchId) {
+            try {
                 // Load pickup locations
-                const { data: pickupData, error: pickupError } = await supabase
+                const { data: pickups, error: pickupError } = await supabase
                     .from('pickup_locations')
                     .select('*')
+                    .or(`branch_id.eq.${branchId},branch_id.is.null`)
                     .order('name');
                 
-                if (!pickupError && pickupData) {
-                    locations.pickupLocations = pickupData;
+                if (!pickupError) {
+                    locations.pickup = pickups || [];
                 }
                 
                 // Load delivery locations
-                const { data: deliveryData, error: deliveryError } = await supabase
+                const { data: deliveries, error: deliveryError } = await supabase
                     .from('delivery_locations')
                     .select('*')
+                    .or(`branch_id.eq.${branchId},branch_id.is.null`)
                     .order('name');
                 
-                if (!deliveryError && deliveryData) {
-                    locations.deliveryLocations = deliveryData;
+                if (!deliveryError) {
+                    locations.delivery = deliveries || [];
                 }
                 
-                console.log('Locations loaded:', locations);
             } catch (error) {
                 console.error('Error loading locations:', error);
             }
         }
         
-        // Initialize autocomplete for inputs
-        function setupAutocomplete(inputId, dropdownId, dataSource) {
-            const input = document.getElementById(inputId);
-            const dropdown = document.getElementById(dropdownId);
+        // Toggle location type
+        function toggleLocationType(type) {
+            selectedLocationType = type;
             
-            input.addEventListener('input', function() {
-                const value = this.value.toLowerCase();
-                dropdown.innerHTML = '';
-                
-                if (value.length < 2) {
-                    dropdown.classList.remove('active');
-                    return;
-                }
-                
-                const filtered = dataSource.filter(item => 
-                    item.name.toLowerCase().includes(value)
-                ).slice(0, 20); // Limit to 20 results
-                
-                if (filtered.length > 0) {
-                    dropdown.classList.add('active');
-                    filtered.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'autocomplete-item';
-                        div.innerHTML = highlightMatch(item.name, value);
-                        div.addEventListener('click', function() {
-                            input.value = item.name;
-                            input.dataset.id = item.id;
-                            dropdown.classList.remove('active');
-                        });
-                        dropdown.appendChild(div);
-                    });
-                } else {
-                    dropdown.classList.remove('active');
-                }
-            });
+            // Update UI
+            document.getElementById('pickupToggle').classList.toggle('active', type === 'pickup');
+            document.getElementById('deliveryToggle').classList.toggle('active', type === 'delivery');
+            document.getElementById('locationLabel').textContent = type === 'pickup' ? 'Pickup' : 'Delivery';
             
-            input.addEventListener('focus', function() {
-                if (this.value.length >= 2) {
-                    this.dispatchEvent(new Event('input'));
-                }
-            });
-            
-            document.addEventListener('click', function(e) {
-                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.classList.remove('active');
-                }
-            });
+            // Clear and update input
+            const input = document.getElementById('locationInput');
+            input.value = '';
+            input.placeholder = `Start typing to search ${type} locations...`;
+            document.getElementById('locationDropdown').classList.remove('active');
         }
         
+        // Setup autocomplete for location input
+        document.getElementById('locationInput').addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            const dropdown = document.getElementById('locationDropdown');
+            
+            if (value.length < 2 || !selectedBranch) {
+                dropdown.classList.remove('active');
+                return;
+            }
+            
+            const currentLocations = locations[selectedLocationType];
+            const filtered = currentLocations.filter(loc => 
+                loc.name.toLowerCase().includes(value)
+            ).slice(0, 20);
+            
+            if (filtered.length > 0) {
+                dropdown.innerHTML = filtered.map(loc => `
+                    <div class="autocomplete-item" onclick="selectLocation('${loc.id}', '${loc.name}')">
+                        ${highlightMatch(loc.name, value)}
+                    </div>
+                `).join('');
+                dropdown.classList.add('active');
+            } else {
+                dropdown.classList.remove('active');
+            }
+        });
+        
+        // Select location from dropdown
+        function selectLocation(id, name) {
+            document.getElementById('locationInput').value = name;
+            document.getElementById('locationInput').dataset.locationId = id;
+            document.getElementById('locationDropdown').classList.remove('active');
+        }
+        
+        // Highlight matching text
         function highlightMatch(text, search) {
             const regex = new RegExp(`(${search})`, 'gi');
             return text.replace(regex, '<span class="highlight">$1</span>');
         }
         
-        // Navigation functions
-        function nextStep() {
-            if (validateCurrentStep()) {
-                if (currentStep === 4) {
-                    showReview();
-                    currentStep++;
-                    showStep(currentStep);
-                } else if (currentStep === 5) {
-                    submitForm();
+        // Handle category selection
+        document.querySelectorAll('.category-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                const category = this.dataset.category;
+                
+                if (selectedCategories.includes(category)) {
+                    selectedCategories = selectedCategories.filter(c => c !== category);
+                    this.classList.remove('selected');
                 } else {
-                    currentStep++;
-                    showStep(currentStep);
+                    selectedCategories.push(category);
+                    this.classList.add('selected');
                 }
-            }
-        }
-        
-        function previousStep() {
-            if (currentStep > 1 && currentStep !== 6) {
-                currentStep--;
-                showStep(currentStep);
-            }
-        }
-        
-        function showStep(step) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            
-            if (step <= 5) {
-                document.getElementById(`step${step}`).classList.add('active');
-            } else {
-                document.getElementById('success').classList.add('active');
-            }
-            
-            // Update step indicators
-            document.querySelectorAll('.step-dot').forEach((dot, index) => {
-                dot.classList.toggle('active', index === step - 1);
-                dot.classList.toggle('completed', index < step - 1);
             });
-            
-            // Update navigation buttons
-            document.getElementById('prevBtn').style.display = step > 1 && step <= 5 ? 'inline-block' : 'none';
-            
-            if (step === 5) {
-                document.getElementById('nextBtn').textContent = 'Submit';
-            } else if (step > 5) {
-                document.getElementById('nextBtn').style.display = 'none';
-            } else {
-                document.getElementById('nextBtn').textContent = 'Next →';
-                document.getElementById('nextBtn').style.display = 'inline-block';
-            }
+        });
+        
+        // Handle file uploads
+        function handleFileUpload(files, type) {
+            Array.from(files).forEach(file => {
+                if (file.size > 10485760) { // 10MB limit
+                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+                    return;
+                }
+                
+                const mediaItem = {
+                    id: ++mediaCounter,
+                    type: type,
+                    name: file.name,
+                    size: file.size,
+                    file: file,
+                    url: null
+                };
+                
+                // Create preview for images
+                if (type === 'photo') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        mediaItem.url = e.target.result;
+                        addMediaToGallery(mediaItem);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    addMediaToGallery(mediaItem);
+                }
+                
+                uploadedMedia.push(mediaItem);
+            });
         }
         
-        function validateCurrentStep() {
-            switch(currentStep) {
-                case 1:
-                    const username = document.getElementById('driverUsername').value;
-                    const name = document.getElementById('driverName').value;
-                    const region = document.getElementById('region').value;
-                    
-                    if (!username || !name || !region) {
-                        alert('Please fill in all required fields');
-                        return false;
-                    }
-                    return true;
-                    
-                case 2:
-                    const branch = document.getElementById('branch').value;
-                    const pickup = document.getElementById('pickupLocation').value;
-                    const delivery = document.getElementById('deliveryLocation').value;
-                    
-                    if (!branch || !pickup || !delivery) {
-                        alert('Please fill in all location fields');
-                        return false;
-                    }
-                    return true;
-                    
-                case 3:
-                    const frequency = document.getElementById('frequency').value;
-                    
-                    if (!frequency) {
-                        alert('Please select delivery frequency');
-                        return false;
-                    }
-                    return true;
-                    
-                case 4:
-                    return true;
-                    
-                case 5:
-                    return true;
-            }
-            return true;
-        }
-        
-        function showReview() {
-            const reviewContent = document.getElementById('reviewContent');
-            const driver = {
-                username: document.getElementById('driverUsername').value,
-                name: document.getElementById('driverName').value,
-                email: document.getElementById('driverEmail').value,
-                phone: document.getElementById('driverPhone').value,
-                region: document.getElementById('region').value
-            };
+        // Add media to gallery
+        function addMediaToGallery(mediaItem) {
+            const gallery = document.getElementById('mediaGallery');
+            const div = document.createElement('div');
+            div.className = 'media-item';
+            div.dataset.id = mediaItem.id;
             
-            const locations = {
-                branch: document.getElementById('branch').value,
-                pickup: document.getElementById('pickupLocation').value,
-                delivery: document.getElementById('deliveryLocation').value
-            };
+            let icon = '📄';
+            if (mediaItem.type === 'photo') icon = '📷';
+            if (mediaItem.type === 'video') icon = '🎥';
             
-            const instructions = {
-                categories: selectedInstructionTypes,
-                access: document.getElementById('accessInstructions').value,
-                procedure: document.getElementById('deliveryProcedure').value,
-                contact: document.getElementById('contactInfo').value,
-                timeFrom: document.getElementById('preferredTimeFrom').value,
-                timeTo: document.getElementById('preferredTimeTo').value,
-                special: document.getElementById('specialHandling').value,
-                frequency: document.getElementById('frequency').value
-            };
-            
-            reviewContent.innerHTML = `
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3 style="margin-bottom: 15px;">Driver Information</h3>
-                    <p><strong>Name:</strong> ${driver.name} (${driver.username})</p>
-                    <p><strong>Contact:</strong> ${driver.email || 'Not provided'} | ${driver.phone || 'Not provided'}</p>
-                    <p><strong>Region:</strong> ${driver.region}</p>
-                </div>
-                
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3 style="margin-bottom: 15px;">Location Details</h3>
-                    <p><strong>Branch:</strong> ${locations.branch}</p>
-                    <p><strong>Pickup:</strong> ${locations.pickup}</p>
-                    <p><strong>Delivery:</strong> ${locations.delivery}</p>
-                </div>
-                
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3 style="margin-bottom: 15px;">Instructions Summary</h3>
-                    <p><strong>Categories:</strong> ${instructions.categories.join(', ') || 'None selected'}</p>
-                    <p><strong>Frequency:</strong> ${instructions.frequency}</p>
-                    ${instructions.timeFrom ? `<p><strong>Preferred Time:</strong> ${instructions.timeFrom} - ${instructions.timeTo}</p>` : ''}
-                    <p><strong>Media Files:</strong> ${uploadedMedia.length} file(s) uploaded</p>
-                </div>
+            div.innerHTML = `
+                ${mediaItem.url ? 
+                    `<img src="${mediaItem.url}" class="media-preview">` : 
+                    `<div class="media-preview">${icon}</div>`
+                }
+                <button class="remove-btn" onclick="removeMedia(${mediaItem.id})">×</button>
+                <div class="media-description">${mediaItem.name}</div>
             `;
+            
+            gallery.appendChild(div);
         }
         
-        async function submitForm() {
-            const submitBtn = document.getElementById('nextBtn');
+        // Remove media
+        function removeMedia(mediaId) {
+            uploadedMedia = uploadedMedia.filter(m => m.id !== mediaId);
+            document.querySelector(`[data-id="${mediaId}"]`).remove();
+        }
+        
+        // Submit instructions
+        async function submitInstructions() {
+            // Validate form
+            if (!selectedBranch) {
+                alert('Please select a branch');
+                return;
+            }
+            
+            const locationInput = document.getElementById('locationInput');
+            const instructions = document.getElementById('instructions').value.trim();
+            const frequency = document.getElementById('frequency').value;
+            
+            if (!locationInput.value) {
+                alert('Please select a location');
+                return;
+            }
+            
+            if (!instructions) {
+                alert('Please enter delivery instructions');
+                return;
+            }
+            
+            if (!frequency) {
+                alert('Please select delivery frequency');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Submitting... <span class="loading-spinner"></span>';
             
             try {
-                // Prepare driver data
-                const driverData = {
-                    username: document.getElementById('driverUsername').value,
-                    full_name: document.getElementById('driverName').value,
-                    email: document.getElementById('driverEmail').value,
-                    phone: document.getElementById('driverPhone').value,
-                    region: document.getElementById('region').value
-                };
+                // Get or create location
+                let locationId = locationInput.dataset.locationId;
                 
-                // Insert or update driver
-                const { data: driver, error: driverError } = await supabase
-                    .from('drivers')
-                    .upsert(driverData, { onConflict: 'username' })
-                    .select()
-                    .single();
-                
-                if (driverError) throw driverError;
-                
-                // Get or create location IDs
-                const branchName = document.getElementById('branch').value;
-                const pickupName = document.getElementById('pickupLocation').value;
-                const deliveryName = document.getElementById('deliveryLocation').value;
-                
-                // Insert locations if they don't exist
-                const { data: branch } = await supabase
-                    .from('branches')
-                    .upsert({ name: branchName }, { onConflict: 'name' })
-                    .select()
-                    .single();
-                
-                const { data: pickup } = await supabase
-                    .from('pickup_locations')
-                    .upsert({ name: pickupName, branch_id: branch?.id }, { onConflict: 'name' })
-                    .select()
-                    .single();
-                
-                const { data: delivery } = await supabase
-                    .from('delivery_locations')
-                    .upsert({ 
-                        name: deliveryName, 
-                        state: document.getElementById('region').value,
-                        branch_id: branch?.id 
-                    }, { onConflict: 'name' })
-                    .select()
-                    .single();
+                if (!locationId) {
+                    // Create new location if doesn't exist
+                    const table = selectedLocationType === 'pickup' ? 'pickup_locations' : 'delivery_locations';
+                    const locationData = {
+                        name: locationInput.value,
+                        branch_id: selectedBranch.id
+                    };
+                    
+                    if (selectedLocationType === 'delivery' && currentDriver.region) {
+                        locationData.state = currentDriver.region;
+                    }
+                    
+                    const { data: newLocation, error } = await supabase
+                        .from(table)
+                        .insert([locationData])
+                        .select()
+                        .single();
+                    
+                    if (error) throw error;
+                    locationId = newLocation.id;
+                }
                 
                 // Prepare instruction data
                 const instructionData = {
-                    driver_id: driver.id,
-                    branch_id: branch?.id,
-                    pickup_location_id: pickup?.id,
-                    delivery_location_id: delivery?.id,
-                    instruction_types: selectedInstructionTypes,
-                    written_instructions: document.getElementById('deliveryProcedure').value,
-                    delivery_frequency: document.getElementById('frequency').value,
-                    timing_requirements: `${document.getElementById('preferredTimeFrom').value} - ${document.getElementById('preferredTimeTo').value}`,
-                    access_instructions: document.getElementById('accessInstructions').value,
-                    contact_info: document.getElementById('contactInfo').value,
-                    special_handling: document.getElementById('specialHandling').value,
-                    challenges: document.getElementById('additionalNotes').value
+                    driver_id: currentDriver.id,
+                    branch_id: selectedBranch.id,
+                    instruction_types: selectedCategories,
+                    written_instructions: instructions,
+                    delivery_frequency: frequency
                 };
+                
+                // Add location based on type
+                if (selectedLocationType === 'pickup') {
+                    instructionData.pickup_location_id = locationId;
+                } else {
+                    instructionData.delivery_location_id = locationId;
+                }
                 
                 // Insert instruction
                 const { data: instruction, error: instructionError } = await supabase
                     .from('delivery_instructions')
-                    .insert(instructionData)
+                    .insert([instructionData])
                     .select()
                     .single();
                 
                 if (instructionError) throw instructionError;
                 
-                // Upload media files if any
+                // Upload media files
                 for (const media of uploadedMedia) {
                     if (media.file) {
                         const fileName = `${instruction.id}/${Date.now()}_${media.name}`;
+                        
                         const { data: upload, error: uploadError } = await supabase.storage
                             .from('delivery-media')
                             .upload(fileName, media.file);
@@ -992,173 +1014,78 @@
                             
                             await supabase
                                 .from('media_uploads')
-                                .insert({
+                                .insert([{
                                     instruction_id: instruction.id,
                                     file_type: media.type,
                                     file_name: media.name,
                                     file_url: publicUrl.publicUrl,
-                                    file_size: media.size,
-                                    description: media.description
-                                });
+                                    file_size: media.size
+                                }]);
                         }
                     }
                 }
                 
-                // Show success
-                showSuccessSummary(instruction.id);
-                currentStep = 6;
-                showStep(6);
+                // Show success message
+                document.getElementById('mainForm').classList.remove('active');
+                document.getElementById('successMessage').classList.add('active');
                 
             } catch (error) {
                 console.error('Submission error:', error);
-                alert('Error submitting form. Please try again.');
+                alert('Error submitting instructions. Please try again.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit';
+                submitBtn.innerHTML = '✅ Submit Instructions';
             }
         }
         
-        function showSuccessSummary(instructionId) {
-            const summary = document.getElementById('submissionSummary');
-            summary.innerHTML = `
-                <h3 style="margin-bottom: 15px;">Submission Details</h3>
-                <p><strong>Reference ID:</strong> ${instructionId}</p>
-                <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
-                <p><strong>Status:</strong> Successfully saved to database</p>
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #dee2e6;">
-                    <p style="color: #666;">Your instructions have been saved and will be available to all drivers serving this route.</p>
-                </div>
-            `;
-        }
-        
+        // Reset form
         function resetForm() {
-            currentStep = 1;
-            selectedInstructionTypes = [];
+            // Clear form
+            document.getElementById('locationInput').value = '';
+            document.getElementById('instructions').value = '';
+            document.getElementById('frequency').value = '';
+            
+            // Clear selections
+            selectedBranch = null;
+            selectedCategories = [];
             uploadedMedia = [];
-            
-            // Reset all form fields
-            document.querySelectorAll('input, textarea, select').forEach(field => {
-                field.value = '';
-            });
-            
-            // Reset media gallery
+            document.querySelectorAll('.branch-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.category-chip').forEach(chip => chip.classList.remove('selected'));
             document.getElementById('mediaGallery').innerHTML = '';
             
-            // Reset instruction type chips
-            document.querySelectorAll('.type-chip').forEach(chip => {
-                chip.classList.remove('selected');
-            });
+            // Show form again
+            document.getElementById('successMessage').classList.remove('active');
+            document.getElementById('mainForm').classList.add('active');
+        }
+        
+        // Logout
+        function logout() {
+            currentDriver = null;
+            selectedBranch = null;
+            document.getElementById('driverUsername').value = '';
+            document.getElementById('mainForm').classList.remove('active');
+            document.getElementById('loginSection').style.display = 'block';
+            resetForm();
+        }
+        
+        // Show error message
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const input = document.getElementById('locationInput');
+            const dropdown = document.getElementById('locationDropdown');
             
-            showStep(1);
-            document.querySelector('.navigation').style.display = 'flex';
-        }
-        
-        // Handle media uploads
-        function handleImageUpload(files) {
-            Array.from(files).forEach(file => {
-                if (file.size > 10485760) { // 10MB limit
-                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const mediaItem = {
-                        id: ++mediaCounter,
-                        type: 'image',
-                        name: file.name,
-                        size: file.size,
-                        url: e.target.result,
-                        file: file,
-                        description: ''
-                    };
-                    
-                    uploadedMedia.push(mediaItem);
-                    addMediaToGallery(mediaItem);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        function handleDocUpload(files) {
-            Array.from(files).forEach(file => {
-                if (file.size > 10485760) { // 10MB limit
-                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
-                    return;
-                }
-                
-                const mediaItem = {
-                    id: ++mediaCounter,
-                    type: 'document',
-                    name: file.name,
-                    size: file.size,
-                    file: file,
-                    description: ''
-                };
-                
-                uploadedMedia.push(mediaItem);
-                addMediaToGallery(mediaItem);
-            });
-        }
-        
-        function addMediaToGallery(mediaItem) {
-            const gallery = document.getElementById('mediaGallery');
-            const mediaElement = document.createElement('div');
-            mediaElement.className = 'media-item';
-            mediaElement.dataset.id = mediaItem.id;
-            
-            let previewContent = '';
-            if (mediaItem.type === 'image') {
-                previewContent = `<img src="${mediaItem.url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;">`;
-            } else {
-                previewContent = '<div class="media-preview">📄</div>';
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
             }
-            
-            mediaElement.innerHTML = `
-                ${previewContent}
-                <button class="remove-btn" onclick="removeMedia(${mediaItem.id})">×</button>
-                <div class="media-description">
-                    <input type="text" placeholder="Add description..." onchange="updateDescription(${mediaItem.id}, this.value)">
-                </div>
-            `;
-            
-            gallery.appendChild(mediaElement);
-        }
-        
-        function removeMedia(mediaId) {
-            uploadedMedia = uploadedMedia.filter(item => item.id !== mediaId);
-            const element = document.querySelector(`[data-id="${mediaId}"]`);
-            if (element) element.remove();
-        }
-        
-        function updateDescription(mediaId, description) {
-            const media = uploadedMedia.find(item => item.id === mediaId);
-            if (media) media.description = description;
-        }
-        
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load locations from Supabase
-            loadLocations().then(() => {
-                // Setup autocomplete after locations are loaded
-                setupAutocomplete('branch', 'branchDropdown', locations.branches);
-                setupAutocomplete('pickupLocation', 'pickupDropdown', locations.pickupLocations);
-                setupAutocomplete('deliveryLocation', 'deliveryDropdown', locations.deliveryLocations);
-            });
-            
-            // Setup instruction type chips
-            document.querySelectorAll('.type-chip').forEach(chip => {
-                chip.addEventListener('click', function() {
-                    const type = this.dataset.type;
-                    if (selectedInstructionTypes.includes(type)) {
-                        selectedInstructionTypes = selectedInstructionTypes.filter(t => t !== type);
-                        this.classList.remove('selected');
-                    } else {
-                        selectedInstructionTypes.push(type);
-                        this.classList.add('selected');
-                    }
-                });
-            });
         });
     </script>
 </body>
