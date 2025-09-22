@@ -3,23 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Driver Instructions Collection Form</title>
-    
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Supabase Configuration -->
-    <script>
-        // Replace with your actual Supabase credentials
-        const SUPABASE_URL = 'https://umlkgeczmehclbmmpuuv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGtnZWN6bWVoY2xibW1wdXV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTUxOTQsImV4cCI6MjA3NDAzMTE5NH0.GrJMY3LL9_QJMmgcTFHY6ezqxgAPPplYLulzUVX4aBs';
-        
-        // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        console.log('Supabase client initialized for driver form:', supabase);
-    </script>
-    
+    <title>Smartways Driver Instructions Portal v14</title>
     <style>
         * {
             margin: 0;
@@ -35,7 +19,7 @@
         }
         
         .container {
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -51,7 +35,7 @@
         }
         
         .header h1 {
-            font-size: 24px;
+            font-size: 26px;
             margin-bottom: 10px;
         }
         
@@ -66,10 +50,16 @@
         
         .step {
             display: none;
+            animation: fadeIn 0.3s ease-in;
         }
         
         .step.active {
             display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .step-indicator {
@@ -92,6 +82,10 @@
             transform: scale(1.2);
         }
         
+        .step-dot.completed {
+            background: #4CAF50;
+        }
+        
         .form-group {
             margin-bottom: 25px;
         }
@@ -101,6 +95,11 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
+            font-size: 14px;
+        }
+        
+        .required {
+            color: #f44336;
         }
         
         input, select, textarea {
@@ -110,6 +109,7 @@
             border-radius: 8px;
             font-size: 16px;
             transition: border-color 0.3s ease;
+            background: white;
         }
         
         input:focus, select:focus, textarea:focus {
@@ -118,61 +118,70 @@
             box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         }
         
-        .client-card {
+        .autocomplete-wrapper {
+            position: relative;
+        }
+        
+        .autocomplete-input {
+            position: relative;
+        }
+        
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
             border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+        
+        .autocomplete-item {
+            padding: 12px 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .client-card:hover {
-            border-color: #2196F3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .client-card.selected {
-            border-color: #2196F3;
-            background: #f8fffe;
-        }
-        
-        .client-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .client-info {
+            transition: background 0.2s;
             font-size: 14px;
-            color: #666;
+            border-bottom: 1px solid #f5f5f5;
         }
         
-        .branches-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+        .autocomplete-item:hover {
+            background: #f5f5f5;
         }
         
-        .branch-card {
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .branch-card:hover {
-            border-color: #2196F3;
-            background: #f8fffe;
-        }
-        
-        .branch-card.selected {
-            border-color: #2196F3;
+        .autocomplete-item.selected {
             background: #e3f2fd;
+            font-weight: 500;
+        }
+        
+        .autocomplete-item .highlight {
+            background: #ffeb3b;
+            font-weight: 600;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .instruction-section {
@@ -184,23 +193,30 @@
         
         .instruction-type {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
         
         .type-chip {
             padding: 8px 16px;
-            background: #e1e5e9;
+            background: white;
+            border: 2px solid #e1e5e9;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 14px;
         }
         
+        .type-chip:hover {
+            border-color: #2196F3;
+            transform: translateY(-1px);
+        }
+        
         .type-chip.selected {
             background: #2196F3;
             color: white;
+            border-color: #2196F3;
         }
         
         .media-upload-section {
@@ -213,9 +229,14 @@
             transition: all 0.3s ease;
         }
         
+        .media-upload-section:hover {
+            background: #e8f4fd;
+            border-color: #1976D2;
+        }
+        
         .upload-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
@@ -238,11 +259,16 @@
         .upload-btn:hover {
             background: #2196F3;
             color: white;
+            transform: translateY(-2px);
+        }
+        
+        .upload-btn i {
+            font-size: 24px;
         }
         
         .media-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
@@ -270,7 +296,7 @@
             justify-content: center;
             background: #f8f9fa;
             color: #666;
-            font-size: 24px;
+            font-size: 40px;
         }
         
         .media-preview img {
@@ -294,6 +320,11 @@
             transition: all 0.3s ease;
         }
         
+        .media-item .remove-btn:hover {
+            background: #f44336;
+            transform: scale(1.1);
+        }
+        
         .media-description {
             padding: 8px;
             font-size: 12px;
@@ -309,6 +340,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-right: 10px;
+            font-weight: 600;
         }
         
         .btn-primary {
@@ -350,8 +382,7 @@
         }
         
         .success-icon {
-            font-size: 48px;
-            color: #4CAF50;
+            font-size: 72px;
             margin-bottom: 20px;
         }
         
@@ -359,95 +390,29 @@
             display: none;
         }
         
-        .tips-section {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
             padding: 15px;
             margin: 20px 0;
             border-radius: 0 8px 8px 0;
-        }
-        
-        .tips-title {
-            font-weight: 600;
-            color: #ef6c00;
-            margin-bottom: 10px;
-        }
-        
-        .tips-list {
             font-size: 14px;
-            color: #bf360c;
-            line-height: 1.5;
+            color: #0d47a1;
         }
         
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        
-        .loading-overlay.active {
-            display: flex;
-        }
-        
-        .loading-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 300px;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2196F3;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            z-index: 10000;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-        }
-        
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background: #4CAF50;
-        }
-        
-        .notification.error {
-            background: #f44336;
-        }
-        
-        .notification.info {
-            background: #2196F3;
+        .timing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
         
         @media (max-width: 768px) {
@@ -462,22 +427,22 @@
             .upload-options {
                 grid-template-columns: 1fr;
             }
+            
+            .media-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .timing-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <div id="loadingText">Submitting your instructions...</div>
-        </div>
-    </div>
-
     <div class="container">
         <div class="header">
-            <h1>📱 Enhanced Driver Instructions</h1>
-            <p>Capture delivery instructions with photos, videos & documents</p>
+            <h1>📋 Smartways Driver Instructions Portal</h1>
+            <p>Capture and share delivery instructions with your team</p>
         </div>
         
         <div class="form-section">
@@ -486,135 +451,178 @@
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
+                <div class="step-dot"></div>
             </div>
             
-            <!-- Step 1: Driver Login -->
+            <!-- Step 1: Driver Information -->
             <div class="step active" id="step1">
                 <h2 style="margin-bottom: 20px;">Driver Information</h2>
                 <div class="form-group">
-                    <label for="driverUsername">Driver Username/ID</label>
-                    <input type="text" id="driverUsername" placeholder="Enter your driver ID" required>
+                    <label for="driverUsername">Driver ID/Username <span class="required">*</span></label>
+                    <input type="text" id="driverUsername" placeholder="Enter your driver ID (e.g., NSW_Theo)" required>
                 </div>
                 <div class="form-group">
-                    <label for="driverName">Full Name</label>
+                    <label for="driverName">Full Name <span class="required">*</span></label>
                     <input type="text" id="driverName" placeholder="Enter your full name" required>
                 </div>
                 <div class="form-group">
-                    <label for="region">Primary Region</label>
+                    <label for="driverEmail">Email Address</label>
+                    <input type="email" id="driverEmail" placeholder="your.email@smartways.com.au">
+                </div>
+                <div class="form-group">
+                    <label for="driverPhone">Phone Number</label>
+                    <input type="tel" id="driverPhone" placeholder="04XX XXX XXX">
+                </div>
+                <div class="form-group">
+                    <label for="region">Primary Region <span class="required">*</span></label>
                     <select id="region" required>
                         <option value="">Select your region</option>
-                        <option value="Sydney">Sydney</option>
-                        <option value="Melbourne">Melbourne</option>
-                        <option value="Brisbane">Brisbane</option>
-                        <option value="Perth">Perth</option>
-                        <option value="Adelaide">Adelaide</option>
+                        <option value="NSW">New South Wales</option>
+                        <option value="VIC">Victoria</option>
+                        <option value="QLD">Queensland</option>
+                        <option value="WA">Western Australia</option>
+                        <option value="SA">South Australia</option>
+                        <option value="TAS">Tasmania</option>
+                        <option value="ACT">Australian Capital Territory</option>
+                        <option value="NT">Northern Territory</option>
                     </select>
                 </div>
             </div>
             
-            <!-- Step 2: Client Selection -->
+            <!-- Step 2: Location Selection -->
             <div class="step" id="step2">
-                <h2 style="margin-bottom: 20px;">Select Master Client</h2>
-                <p style="margin-bottom: 20px; color: #666;">Choose the master client you'd like to provide instructions for:</p>
+                <h2 style="margin-bottom: 20px;">Location Details</h2>
                 
-                <div id="clientsList">
-                    <!-- Clients will be loaded from database -->
-                </div>
-            </div>
-            
-            <!-- Step 3: Branch Selection -->
-            <div class="step" id="step3">
-                <h2 style="margin-bottom: 20px;">Select Specific Branches</h2>
-                <p style="margin-bottom: 20px; color: #666;">Choose the specific branches you deliver to:</p>
-                
-                <div class="branches-grid" id="branchesList">
-                    <!-- Branches will be populated based on client selection -->
-                </div>
-            </div>
-            
-            <!-- Step 4: Enhanced Instructions Input with Multimedia -->
-            <div class="step" id="step4">
-                <h2 style="margin-bottom: 20px;">Delivery Instructions & Media</h2>
-                
-                <div class="instruction-section">
-                    <h3 style="margin-bottom: 15px;">Instruction Type</h3>
-                    <div class="instruction-type">
-                        <div class="type-chip" data-type="access">🔑 Access Instructions</div>
-                        <div class="type-chip" data-type="delivery">📦 Delivery Procedures</div>
-                        <div class="type-chip" data-type="contact">📞 Contact Information</div>
-                        <div class="type-chip" data-type="timing">⏰ Timing Requirements</div>
-                        <div class="type-chip" data-type="special">⚠️ Special Handling</div>
+                <div class="form-group">
+                    <label for="branch">Branch <span class="required">*</span></label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="branch" placeholder="Start typing to search branches..." required>
+                        <div class="autocomplete-dropdown" id="branchDropdown"></div>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="instructions">Written Instructions</label>
-                    <textarea id="instructions" rows="4" placeholder="Describe the delivery instructions in detail...
-
-Examples:
-• Gate access: Use keypad code 1234# at main entrance
-• Loading dock: Enter via side entrance, dock bay 3
-• Contact: Call Sarah (0404 123 456) on arrival
-• Timing: Deliveries only between 8AM-4PM weekdays
-• Special: Fragile items - use freight elevator only" required></textarea>
+                    <label for="pickupLocation">Pickup Location <span class="required">*</span></label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="pickupLocation" placeholder="Start typing to search pickup locations..." required>
+                        <div class="autocomplete-dropdown" id="pickupDropdown"></div>
+                    </div>
                 </div>
                 
-                <!-- Multimedia Upload Section -->
+                <div class="form-group">
+                    <label for="deliveryLocation">Delivery Location <span class="required">*</span></label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="deliveryLocation" placeholder="Start typing to search delivery locations..." required>
+                        <div class="autocomplete-dropdown" id="deliveryDropdown"></div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    💡 <strong>Tip:</strong> Start typing the location name and select from the dropdown. If you can't find a location, you can type it manually.
+                </div>
+            </div>
+            
+            <!-- Step 3: Instruction Details -->
+            <div class="step" id="step3">
+                <h2 style="margin-bottom: 20px;">Delivery Instructions</h2>
+                
+                <div class="instruction-section">
+                    <h3 style="margin-bottom: 15px;">Instruction Categories</h3>
+                    <div class="instruction-type">
+                        <div class="type-chip" data-type="access">🔑 Access</div>
+                        <div class="type-chip" data-type="delivery">📦 Delivery</div>
+                        <div class="type-chip" data-type="contact">📞 Contact</div>
+                        <div class="type-chip" data-type="timing">⏰ Timing</div>
+                        <div class="type-chip" data-type="safety">⚠️ Safety</div>
+                        <div class="type-chip" data-type="special">⭐ Special</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="accessInstructions">Access Instructions</label>
+                    <textarea id="accessInstructions" rows="3" placeholder="e.g., Use loading dock entrance, keypad code 1234#, call security on arrival"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deliveryProcedure">Delivery Procedure</label>
+                    <textarea id="deliveryProcedure" rows="3" placeholder="e.g., Leave packages at reception desk, use freight elevator, stack pallets in designated area"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactInfo">Site Contact Information</label>
+                    <textarea id="contactInfo" rows="2" placeholder="e.g., Contact: John Smith - 0412 345 678, Reception: 02 9XXX XXXX"></textarea>
+                </div>
+                
+                <div class="timing-grid">
+                    <div class="form-group">
+                        <label for="preferredTimeFrom">Preferred Delivery From</label>
+                        <input type="time" id="preferredTimeFrom">
+                    </div>
+                    <div class="form-group">
+                        <label for="preferredTimeTo">Preferred Delivery To</label>
+                        <input type="time" id="preferredTimeTo">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="specialHandling">Special Handling Requirements</label>
+                    <textarea id="specialHandling" rows="3" placeholder="e.g., Fragile equipment, temperature-sensitive items, requires signature"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="frequency">Delivery Frequency <span class="required">*</span></label>
+                    <select id="frequency" required>
+                        <option value="">Select frequency</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="biweekly">Bi-weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="on-demand">On Demand</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Step 4: Media Upload -->
+            <div class="step" id="step4">
+                <h2 style="margin-bottom: 20px;">Visual Instructions</h2>
+                
                 <div class="media-upload-section">
-                    <h3 style="margin-bottom: 15px; color: #2196F3;">📸 Add Photos, Videos & Documents</h3>
-                    <p style="color: #666; margin-bottom: 20px;">Visual instructions help other drivers understand complex procedures</p>
+                    <h3 style="margin-bottom: 15px; color: #2196F3;">📸 Add Photos & Documents</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Visual aids help other drivers understand complex locations</p>
                     
                     <div class="upload-options">
                         <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
-                            📷
+                            🖼️
                             <span>Upload Photos</span>
                         </button>
-                        <button class="upload-btn" onclick="document.getElementById('videoInput').click()">
-                            🎥
-                            <span>Upload Videos</span>
-                        </button>
-                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        <button class="upload-btn" onclick="document.getElementById('docInput').click()">
                             📄
                             <span>Upload Documents</span>
                         </button>
                     </div>
                     
-                    <input type="file" id="imageInput" class="file-input" accept="image/*" multiple onchange="handleFileUpload(this.files, 'image')">
-                    <input type="file" id="videoInput" class="file-input" accept="video/*" multiple onchange="handleFileUpload(this.files, 'video')">
-                    <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx,.txt" multiple onchange="handleFileUpload(this.files, 'document')">
+                    <input type="file" id="imageInput" class="file-input" accept="image/*" multiple onchange="handleImageUpload(this.files)">
+                    <input type="file" id="docInput" class="file-input" accept=".pdf,.doc,.docx" multiple onchange="handleDocUpload(this.files)">
                 </div>
                 
-                <!-- Tips Section -->
-                <div class="tips-section">
-                    <div class="tips-title">💡 Media Tips</div>
-                    <div class="tips-list">
-                        • <strong>Photos:</strong> Show gate keypads, entrance signs, loading docks<br>
-                        • <strong>Videos:</strong> Record complex access procedures or safety protocols<br>
-                        • <strong>Documents:</strong> Attach site maps, contact lists, or special forms<br>
-                        • <strong>Quality:</strong> Ensure good lighting and clear visibility
-                    </div>
-                </div>
+                <div class="media-gallery" id="mediaGallery"></div>
                 
-                <!-- Media Gallery -->
-                <div class="media-gallery" id="mediaGallery">
-                    <!-- Uploaded media will appear here -->
+                <div class="info-box">
+                    💡 <strong>Recommended uploads:</strong>
+                    <br>• Photos of entrance, loading dock, keypad, signage
+                    <br>• Site maps or floor plans
+                    <br>• Delivery procedure documents
                 </div>
+            </div>
+            
+            <!-- Step 5: Review & Submit -->
+            <div class="step" id="step5">
+                <h2 style="margin-bottom: 20px;">Review & Submit</h2>
+                <div id="reviewContent"></div>
                 
                 <div class="form-group">
-                    <label for="frequency">Delivery Frequency</label>
-                    <select id="frequency" required>
-                        <option value="">Select frequency</option>
-                        <option value="Daily">Daily</option>
-                        <option value="Weekly">Weekly</option>
-                        <option value="Bi-weekly">Bi-weekly</option>
-                        <option value="Monthly">Monthly</option>
-                        <option value="Irregular">Irregular</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="challenges">Common Challenges or Issues</label>
-                    <textarea id="challenges" rows="3" placeholder="Describe any recurring challenges or issues at this location..."></textarea>
+                    <label for="additionalNotes">Additional Notes</label>
+                    <textarea id="additionalNotes" rows="3" placeholder="Any other information that might be helpful..."></textarea>
                 </div>
             </div>
             
@@ -622,151 +630,149 @@ Examples:
             <div class="step" id="success">
                 <div class="success-message">
                     <div class="success-icon">✅</div>
-                    <h2>Instructions & Media Submitted!</h2>
-                    <p style="margin: 20px 0; color: #666;">Thank you for providing detailed delivery instructions with visual aids. This comprehensive information will significantly improve our service quality.</p>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                        <strong>Submitted:</strong>
-                        <div id="submissionSummary" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
-                    </div>
+                    <h2>Instructions Submitted Successfully!</h2>
+                    <p style="margin: 20px 0; color: #666;">Thank you for providing detailed delivery instructions. This information will help improve our service quality.</p>
+                    <div id="submissionSummary" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;"></div>
                     <button class="btn btn-primary" onclick="resetForm()">Submit Another Entry</button>
                 </div>
             </div>
             
             <div class="navigation">
-                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">Previous</button>
-                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next</button>
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">← Previous</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next →</button>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Initialize Supabase - REPLACE WITH YOUR ACTUAL CREDENTIALS
+        const SUPABASE_URL = 'https://xfcsgkbdkijyrhrbgbph.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmY3Nna2Jka2lqeXJocmJnYnBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MDk3OTYsImV4cCI6MjA3NDA4NTc5Nn0.biT3BcsbVKQ7MIaJKqNcqRZoGqTMJCjdoA-VVCRa5UA';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Global variables
         let currentStep = 1;
-        let selectedClient = null;
-        let selectedBranches = [];
         let selectedInstructionTypes = [];
         let uploadedMedia = [];
         let mediaCounter = 0;
-        let clients = [];
-        let branches = [];
+        let locations = {
+            branches: [],
+            pickupLocations: [],
+            deliveryLocations: []
+        };
         
-        // Initialize the form
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof supabase !== 'undefined') {
-                loadClientsFromDB();
-            } else {
-                console.error('Supabase not available');
-                showNotification('Database connection failed. Please refresh the page.', 'error');
-            }
-        });
-        
-        // Load clients from Supabase
-        async function loadClientsFromDB() {
+        // Load locations from Supabase on page load
+        async function loadLocations() {
             try {
-                const { data, error } = await supabase
-                    .from('clients')
-                    .select('*')
-                    .order('name');
-
-                if (error) throw error;
-
-                clients = data;
-                displayClients();
-                
-            } catch (error) {
-                console.error('Error loading clients:', error);
-                showNotification('Error loading clients from database', 'error');
-            }
-        }
-        
-        // Display clients in the UI
-        function displayClients() {
-            const clientsList = document.getElementById('clientsList');
-            clientsList.innerHTML = '';
-            
-            clients.forEach(client => {
-                const clientCard = document.createElement('div');
-                clientCard.className = 'client-card';
-                clientCard.dataset.clientId = client.id;
-                clientCard.innerHTML = `
-                    <div class="client-name">${client.name}</div>
-                    <div class="client-info">${client.branches_count || 0} branches • ${client.type}</div>
-                `;
-                clientCard.onclick = () => selectClient(client, clientCard);
-                clientsList.appendChild(clientCard);
-            });
-        }
-        
-        // Select a client
-        function selectClient(client, element) {
-            document.querySelectorAll('.client-card').forEach(c => c.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedClient = client;
-            loadBranches();
-        }
-        
-        // Load branches for selected client
-        async function loadBranches() {
-            if (!selectedClient) return;
-            
-            try {
-                const { data, error } = await supabase
+                // Load branches
+                const { data: branchData, error: branchError } = await supabase
                     .from('branches')
                     .select('*')
-                    .eq('client_id', selectedClient.id)
                     .order('name');
-
-                if (error) throw error;
-
-                branches = data;
-                displayBranches();
                 
+                if (!branchError && branchData) {
+                    locations.branches = branchData;
+                }
+                
+                // Load pickup locations
+                const { data: pickupData, error: pickupError } = await supabase
+                    .from('pickup_locations')
+                    .select('*')
+                    .order('name');
+                
+                if (!pickupError && pickupData) {
+                    locations.pickupLocations = pickupData;
+                }
+                
+                // Load delivery locations
+                const { data: deliveryData, error: deliveryError } = await supabase
+                    .from('delivery_locations')
+                    .select('*')
+                    .order('name');
+                
+                if (!deliveryError && deliveryData) {
+                    locations.deliveryLocations = deliveryData;
+                }
+                
+                console.log('Locations loaded:', locations);
             } catch (error) {
-                console.error('Error loading branches:', error);
-                showNotification('Error loading branches', 'error');
+                console.error('Error loading locations:', error);
             }
         }
         
-        // Display branches
-        function displayBranches() {
-            const branchesList = document.getElementById('branchesList');
-            branchesList.innerHTML = '';
+        // Initialize autocomplete for inputs
+        function setupAutocomplete(inputId, dropdownId, dataSource) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
             
-            branches.forEach(branch => {
-                const branchCard = document.createElement('div');
-                branchCard.className = 'branch-card';
-                branchCard.dataset.branchId = branch.id;
-                branchCard.textContent = branch.name;
-                branchCard.onclick = () => toggleBranch(branch, branchCard);
-                branchesList.appendChild(branchCard);
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                dropdown.innerHTML = '';
+                
+                if (value.length < 2) {
+                    dropdown.classList.remove('active');
+                    return;
+                }
+                
+                const filtered = dataSource.filter(item => 
+                    item.name.toLowerCase().includes(value)
+                ).slice(0, 20); // Limit to 20 results
+                
+                if (filtered.length > 0) {
+                    dropdown.classList.add('active');
+                    filtered.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'autocomplete-item';
+                        div.innerHTML = highlightMatch(item.name, value);
+                        div.addEventListener('click', function() {
+                            input.value = item.name;
+                            input.dataset.id = item.id;
+                            dropdown.classList.remove('active');
+                        });
+                        dropdown.appendChild(div);
+                    });
+                } else {
+                    dropdown.classList.remove('active');
+                }
+            });
+            
+            input.addEventListener('focus', function() {
+                if (this.value.length >= 2) {
+                    this.dispatchEvent(new Event('input'));
+                }
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
             });
         }
         
-        // Toggle branch selection
-        function toggleBranch(branch, element) {
-            const index = selectedBranches.findIndex(b => b.id === branch.id);
-            if (index > -1) {
-                selectedBranches.splice(index, 1);
-                element.classList.remove('selected');
-            } else {
-                selectedBranches.push(branch);
-                element.classList.add('selected');
-            }
+        function highlightMatch(text, search) {
+            const regex = new RegExp(`(${search})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
         }
         
-        // Step navigation
+        // Navigation functions
         function nextStep() {
             if (validateCurrentStep()) {
-                if (currentStep < 4) {
+                if (currentStep === 4) {
+                    showReview();
                     currentStep++;
                     showStep(currentStep);
-                } else {
+                } else if (currentStep === 5) {
                     submitForm();
+                } else {
+                    currentStep++;
+                    showStep(currentStep);
                 }
             }
         }
         
         function previousStep() {
-            if (currentStep > 1) {
+            if (currentStep > 1 && currentStep !== 6) {
                 currentStep--;
                 showStep(currentStep);
             }
@@ -774,14 +780,30 @@ Examples:
         
         function showStep(step) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`step${step}`).classList.add('active');
             
+            if (step <= 5) {
+                document.getElementById(`step${step}`).classList.add('active');
+            } else {
+                document.getElementById('success').classList.add('active');
+            }
+            
+            // Update step indicators
             document.querySelectorAll('.step-dot').forEach((dot, index) => {
-                dot.classList.toggle('active', index < step);
+                dot.classList.toggle('active', index === step - 1);
+                dot.classList.toggle('completed', index < step - 1);
             });
             
-            document.getElementById('prevBtn').style.display = step > 1 ? 'inline-block' : 'none';
-            document.getElementById('nextBtn').textContent = step === 4 ? 'Submit' : 'Next';
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = step > 1 && step <= 5 ? 'inline-block' : 'none';
+            
+            if (step === 5) {
+                document.getElementById('nextBtn').textContent = 'Submit';
+            } else if (step > 5) {
+                document.getElementById('nextBtn').style.display = 'none';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Next →';
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            }
         }
         
         function validateCurrentStep() {
@@ -792,72 +814,290 @@ Examples:
                     const region = document.getElementById('region').value;
                     
                     if (!username || !name || !region) {
-                        showNotification('Please fill in all required fields', 'error');
+                        alert('Please fill in all required fields');
                         return false;
                     }
                     return true;
                     
                 case 2:
-                    if (!selectedClient) {
-                        showNotification('Please select a master client', 'error');
+                    const branch = document.getElementById('branch').value;
+                    const pickup = document.getElementById('pickupLocation').value;
+                    const delivery = document.getElementById('deliveryLocation').value;
+                    
+                    if (!branch || !pickup || !delivery) {
+                        alert('Please fill in all location fields');
                         return false;
                     }
                     return true;
                     
                 case 3:
-                    if (selectedBranches.length === 0) {
-                        showNotification('Please select at least one branch', 'error');
+                    const frequency = document.getElementById('frequency').value;
+                    
+                    if (!frequency) {
+                        alert('Please select delivery frequency');
                         return false;
                     }
                     return true;
                     
                 case 4:
-                    const instructions = document.getElementById('instructions').value;
-                    const frequency = document.getElementById('frequency').value;
+                    return true;
                     
-                    if (!instructions || !frequency) {
-                        showNotification('Please provide instructions and delivery frequency', 'error');
-                        return false;
-                    }
+                case 5:
                     return true;
             }
             return true;
         }
         
-        // File upload handling
-        function handleFileUpload(files, type) {
+        function showReview() {
+            const reviewContent = document.getElementById('reviewContent');
+            const driver = {
+                username: document.getElementById('driverUsername').value,
+                name: document.getElementById('driverName').value,
+                email: document.getElementById('driverEmail').value,
+                phone: document.getElementById('driverPhone').value,
+                region: document.getElementById('region').value
+            };
+            
+            const locations = {
+                branch: document.getElementById('branch').value,
+                pickup: document.getElementById('pickupLocation').value,
+                delivery: document.getElementById('deliveryLocation').value
+            };
+            
+            const instructions = {
+                categories: selectedInstructionTypes,
+                access: document.getElementById('accessInstructions').value,
+                procedure: document.getElementById('deliveryProcedure').value,
+                contact: document.getElementById('contactInfo').value,
+                timeFrom: document.getElementById('preferredTimeFrom').value,
+                timeTo: document.getElementById('preferredTimeTo').value,
+                special: document.getElementById('specialHandling').value,
+                frequency: document.getElementById('frequency').value
+            };
+            
+            reviewContent.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">Driver Information</h3>
+                    <p><strong>Name:</strong> ${driver.name} (${driver.username})</p>
+                    <p><strong>Contact:</strong> ${driver.email || 'Not provided'} | ${driver.phone || 'Not provided'}</p>
+                    <p><strong>Region:</strong> ${driver.region}</p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">Location Details</h3>
+                    <p><strong>Branch:</strong> ${locations.branch}</p>
+                    <p><strong>Pickup:</strong> ${locations.pickup}</p>
+                    <p><strong>Delivery:</strong> ${locations.delivery}</p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">Instructions Summary</h3>
+                    <p><strong>Categories:</strong> ${instructions.categories.join(', ') || 'None selected'}</p>
+                    <p><strong>Frequency:</strong> ${instructions.frequency}</p>
+                    ${instructions.timeFrom ? `<p><strong>Preferred Time:</strong> ${instructions.timeFrom} - ${instructions.timeTo}</p>` : ''}
+                    <p><strong>Media Files:</strong> ${uploadedMedia.length} file(s) uploaded</p>
+                </div>
+            `;
+        }
+        
+        async function submitForm() {
+            const submitBtn = document.getElementById('nextBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Submitting... <span class="loading-spinner"></span>';
+            
+            try {
+                // Prepare driver data
+                const driverData = {
+                    username: document.getElementById('driverUsername').value,
+                    full_name: document.getElementById('driverName').value,
+                    email: document.getElementById('driverEmail').value,
+                    phone: document.getElementById('driverPhone').value,
+                    region: document.getElementById('region').value
+                };
+                
+                // Insert or update driver
+                const { data: driver, error: driverError } = await supabase
+                    .from('drivers')
+                    .upsert(driverData, { onConflict: 'username' })
+                    .select()
+                    .single();
+                
+                if (driverError) throw driverError;
+                
+                // Get or create location IDs
+                const branchName = document.getElementById('branch').value;
+                const pickupName = document.getElementById('pickupLocation').value;
+                const deliveryName = document.getElementById('deliveryLocation').value;
+                
+                // Insert locations if they don't exist
+                const { data: branch } = await supabase
+                    .from('branches')
+                    .upsert({ name: branchName }, { onConflict: 'name' })
+                    .select()
+                    .single();
+                
+                const { data: pickup } = await supabase
+                    .from('pickup_locations')
+                    .upsert({ name: pickupName, branch_id: branch?.id }, { onConflict: 'name' })
+                    .select()
+                    .single();
+                
+                const { data: delivery } = await supabase
+                    .from('delivery_locations')
+                    .upsert({ 
+                        name: deliveryName, 
+                        state: document.getElementById('region').value,
+                        branch_id: branch?.id 
+                    }, { onConflict: 'name' })
+                    .select()
+                    .single();
+                
+                // Prepare instruction data
+                const instructionData = {
+                    driver_id: driver.id,
+                    branch_id: branch?.id,
+                    pickup_location_id: pickup?.id,
+                    delivery_location_id: delivery?.id,
+                    instruction_types: selectedInstructionTypes,
+                    written_instructions: document.getElementById('deliveryProcedure').value,
+                    delivery_frequency: document.getElementById('frequency').value,
+                    timing_requirements: `${document.getElementById('preferredTimeFrom').value} - ${document.getElementById('preferredTimeTo').value}`,
+                    access_instructions: document.getElementById('accessInstructions').value,
+                    contact_info: document.getElementById('contactInfo').value,
+                    special_handling: document.getElementById('specialHandling').value,
+                    challenges: document.getElementById('additionalNotes').value
+                };
+                
+                // Insert instruction
+                const { data: instruction, error: instructionError } = await supabase
+                    .from('delivery_instructions')
+                    .insert(instructionData)
+                    .select()
+                    .single();
+                
+                if (instructionError) throw instructionError;
+                
+                // Upload media files if any
+                for (const media of uploadedMedia) {
+                    if (media.file) {
+                        const fileName = `${instruction.id}/${Date.now()}_${media.name}`;
+                        const { data: upload, error: uploadError } = await supabase.storage
+                            .from('delivery-media')
+                            .upload(fileName, media.file);
+                        
+                        if (!uploadError) {
+                            const { data: publicUrl } = supabase.storage
+                                .from('delivery-media')
+                                .getPublicUrl(fileName);
+                            
+                            await supabase
+                                .from('media_uploads')
+                                .insert({
+                                    instruction_id: instruction.id,
+                                    file_type: media.type,
+                                    file_name: media.name,
+                                    file_url: publicUrl.publicUrl,
+                                    file_size: media.size,
+                                    description: media.description
+                                });
+                        }
+                    }
+                }
+                
+                // Show success
+                showSuccessSummary(instruction.id);
+                currentStep = 6;
+                showStep(6);
+                
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Error submitting form. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit';
+            }
+        }
+        
+        function showSuccessSummary(instructionId) {
+            const summary = document.getElementById('submissionSummary');
+            summary.innerHTML = `
+                <h3 style="margin-bottom: 15px;">Submission Details</h3>
+                <p><strong>Reference ID:</strong> ${instructionId}</p>
+                <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>Status:</strong> Successfully saved to database</p>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+                    <p style="color: #666;">Your instructions have been saved and will be available to all drivers serving this route.</p>
+                </div>
+            `;
+        }
+        
+        function resetForm() {
+            currentStep = 1;
+            selectedInstructionTypes = [];
+            uploadedMedia = [];
+            
+            // Reset all form fields
+            document.querySelectorAll('input, textarea, select').forEach(field => {
+                field.value = '';
+            });
+            
+            // Reset media gallery
+            document.getElementById('mediaGallery').innerHTML = '';
+            
+            // Reset instruction type chips
+            document.querySelectorAll('.type-chip').forEach(chip => {
+                chip.classList.remove('selected');
+            });
+            
+            showStep(1);
+            document.querySelector('.navigation').style.display = 'flex';
+        }
+        
+        // Handle media uploads
+        function handleImageUpload(files) {
             Array.from(files).forEach(file => {
-                // Validate file size (10MB limit)
-                if (file.size > 10 * 1024 * 1024) {
-                    showNotification(`File ${file.name} is too large. Maximum size is 10MB.`, 'error');
+                if (file.size > 10485760) { // 10MB limit
+                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
                     return;
                 }
                 
-                // Validate file type
-                const validTypes = {
-                    'image': ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-                    'video': ['video/mp4', 'video/webm', 'video/avi', 'video/mov'],
-                    'document': ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const mediaItem = {
+                        id: ++mediaCounter,
+                        type: 'image',
+                        name: file.name,
+                        size: file.size,
+                        url: e.target.result,
+                        file: file,
+                        description: ''
+                    };
+                    
+                    uploadedMedia.push(mediaItem);
+                    addMediaToGallery(mediaItem);
                 };
-                
-                if (!validTypes[type].includes(file.type)) {
-                    showNotification(`Invalid file type for ${file.name}. Please check supported formats.`, 'error');
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function handleDocUpload(files) {
+            Array.from(files).forEach(file => {
+                if (file.size > 10485760) { // 10MB limit
+                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
                     return;
                 }
                 
                 const mediaItem = {
                     id: ++mediaCounter,
-                    file: file,
+                    type: 'document',
                     name: file.name,
-                    type: type,
                     size: file.size,
-                    description: `${type} file`,
-                    mimeType: file.type
+                    file: file,
+                    description: ''
                 };
                 
                 uploadedMedia.push(mediaItem);
                 addMediaToGallery(mediaItem);
-                showNotification(`${file.name} added successfully`, 'success');
             });
         }
         
@@ -869,15 +1109,7 @@ Examples:
             
             let previewContent = '';
             if (mediaItem.type === 'image') {
-                try {
-                    const url = URL.createObjectURL(mediaItem.file);
-                    previewContent = `<img src="${url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;" onload="console.log('Image loaded successfully')">`;
-                } catch (error) {
-                    console.error('Error creating image preview:', error);
-                    previewContent = '<div class="media-preview">📷</div>';
-                }
-            } else if (mediaItem.type === 'video') {
-                previewContent = '<div class="media-preview">🎥</div>';
+                previewContent = `<img src="${mediaItem.url}" alt="${mediaItem.name}" style="width: 100%; height: 120px; object-fit: cover;">`;
             } else {
                 previewContent = '<div class="media-preview">📄</div>';
             }
@@ -886,8 +1118,7 @@ Examples:
                 ${previewContent}
                 <button class="remove-btn" onclick="removeMedia(${mediaItem.id})">×</button>
                 <div class="media-description">
-                    <div style="font-size: 10px; color: #999; margin-bottom: 3px;">${mediaItem.name}</div>
-                    <div style="font-size: 9px; color: #666;">${formatFileSize(mediaItem.size)} • ${mediaItem.type}</div>
+                    <input type="text" placeholder="Add description..." onchange="updateDescription(${mediaItem.id}, this.value)">
                 </div>
             `;
             
@@ -896,318 +1127,39 @@ Examples:
         
         function removeMedia(mediaId) {
             uploadedMedia = uploadedMedia.filter(item => item.id !== mediaId);
-            const mediaElement = document.querySelector(`[data-id="${mediaId}"]`);
-            if (mediaElement) {
-                mediaElement.remove();
-            }
+            const element = document.querySelector(`[data-id="${mediaId}"]`);
+            if (element) element.remove();
         }
         
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        function updateDescription(mediaId, description) {
+            const media = uploadedMedia.find(item => item.id === mediaId);
+            if (media) media.description = description;
         }
         
-        // Main form submission
-        async function submitForm() {
-            try {
-                showLoading('Submitting your instructions...');
-                console.log('Starting form submission process...');
-                
-                // 1. Ensure driver exists or create new one
-                console.log('Step 1: Creating/finding driver...');
-                const driverId = await ensureDriverExists();
-                console.log('Driver ID:', driverId);
-                
-                // 2. Create submissions for each selected branch
-                console.log('Step 2: Creating submissions for', selectedBranches.length, 'branches...');
-                const submissionPromises = selectedBranches.map(branch => 
-                    createSubmissionForBranch(driverId, branch)
-                );
-                
-                const submissions = await Promise.all(submissionPromises);
-                console.log('Created submissions:', submissions);
-                
-                // 3. Upload media files for each submission
-                if (uploadedMedia.length > 0) {
-                    console.log('Step 3: Uploading', uploadedMedia.length, 'media files...');
-                    showLoading('Uploading media files...');
-                    
-                    // Test storage access first
-                    const storageTest = await testStorageAccess();
-                    if (!storageTest) {
-                        throw new Error('Storage access test failed. Please check bucket configuration.');
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load locations from Supabase
+            loadLocations().then(() => {
+                // Setup autocomplete after locations are loaded
+                setupAutocomplete('branch', 'branchDropdown', locations.branches);
+                setupAutocomplete('pickupLocation', 'pickupDropdown', locations.pickupLocations);
+                setupAutocomplete('deliveryLocation', 'deliveryDropdown', locations.deliveryLocations);
+            });
+            
+            // Setup instruction type chips
+            document.querySelectorAll('.type-chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const type = this.dataset.type;
+                    if (selectedInstructionTypes.includes(type)) {
+                        selectedInstructionTypes = selectedInstructionTypes.filter(t => t !== type);
+                        this.classList.remove('selected');
+                    } else {
+                        selectedInstructionTypes.push(type);
+                        this.classList.add('selected');
                     }
-                    
-                    await Promise.all(
-                        submissions.map(submission => 
-                            uploadMediaFiles(submission.id)
-                        )
-                    );
-                    console.log('Media upload completed');
-                } else {
-                    console.log('No media files to upload');
-                }
-                
-                hideLoading();
-                showSuccessPage(submissions);
-                console.log('Form submission completed successfully!');
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Form submission failed:', error);
-                console.error('Error details:', {
-                    message: error.message,
-                    stack: error.stack
                 });
-                showNotification(`Submission failed: ${error.message}`, 'error');
-            }
-        }
-        
-        // Test storage access before uploading
-        async function testStorageAccess() {
-            try {
-                console.log('Testing storage access...');
-                
-                // Try to list files in the bucket (this tests basic access)
-                const { data, error } = await supabase.storage
-                    .from('submission-media')
-                    .list('test', {
-                        limit: 1
-                    });
-                
-                if (error) {
-                    console.error('Storage access test failed:', error);
-                    if (error.message.includes('not found')) {
-                        throw new Error('Storage bucket "submission-media" not found. Please create it in Supabase dashboard.');
-                    }
-                    throw new Error(`Storage access error: ${error.message}`);
-                }
-                
-                console.log('✅ Storage access test passed');
-                return true;
-                
-            } catch (error) {
-                console.error('❌ Storage access test failed:', error);
-                showNotification(error.message, 'error');
-                return false;
-            }
-        }
-        
-        async function ensureDriverExists() {
-            const username = document.getElementById('driverUsername').value;
-            
-            // Check if driver exists
-            let { data: driver, error } = await supabase
-                .from('drivers')
-                .select('id')
-                .eq('username', username)
-                .maybeSingle();
-
-            if (!driver) {
-                // Create new driver
-                const { data: newDriver, error: createError } = await supabase
-                    .from('drivers')
-                    .insert({
-                        username: username,
-                        full_name: document.getElementById('driverName').value,
-                        region: document.getElementById('region').value
-                    })
-                    .select()
-                    .single();
-
-                if (createError) throw createError;
-                return newDriver.id;
-            }
-
-            return driver.id;
-        }
-        
-        async function createSubmissionForBranch(driverId, branch) {
-            const { data: submission, error } = await supabase
-                .from('submissions')
-                .insert({
-                    driver_id: driverId,
-                    client_id: selectedClient.id,
-                    branch_id: branch.id,
-                    instructions: document.getElementById('instructions').value,
-                    instruction_types: selectedInstructionTypes.join(', '),
-                    delivery_frequency: document.getElementById('frequency').value,
-                    challenges: document.getElementById('challenges').value,
-                    status: 'pending',
-                    priority: 'medium'
-                })
-                .select()
-                .single();
-
-            if (error) throw error;
-            return submission;
-        }
-        
-        async function uploadMediaFiles(submissionId) {
-            if (uploadedMedia.length === 0) return;
-            
-            showLoading('Uploading media files...');
-            let uploadedCount = 0;
-            let totalFiles = uploadedMedia.length;
-            
-            for (const mediaItem of uploadedMedia) {
-                try {
-                    uploadedCount++;
-                    showLoading(`Uploading file ${uploadedCount}/${totalFiles}: ${mediaItem.name}`);
-                    
-                    // Create unique filename to avoid conflicts
-                    const timestamp = Date.now();
-                    const randomString = Math.random().toString(36).substring(2, 8);
-                    const fileExtension = mediaItem.name.split('.').pop();
-                    const uniqueFileName = `${timestamp}_${randomString}.${fileExtension}`;
-                    const filePath = `${submissionId}/${uniqueFileName}`;
-                    
-                    console.log('Uploading file:', {
-                        name: mediaItem.name,
-                        size: mediaItem.size,
-                        type: mediaItem.mimeType,
-                        path: filePath
-                    });
-                    
-                    // Upload file to Supabase Storage
-                    const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from('submission-media')
-                        .upload(filePath, mediaItem.file, {
-                            cacheControl: '3600',
-                            upsert: false,
-                            contentType: mediaItem.mimeType
-                        });
-
-                    if (uploadError) {
-                        console.error('Storage upload error:', uploadError);
-                        throw new Error(`Storage upload failed: ${uploadError.message}`);
-                    }
-
-                    console.log('File uploaded successfully:', uploadData);
-
-                    // Save file record to database
-                    const { data: dbData, error: dbError } = await supabase
-                        .from('media_files')
-                        .insert({
-                            submission_id: submissionId,
-                            file_name: mediaItem.name,
-                            file_type: mediaItem.type,
-                            file_size: mediaItem.size,
-                            storage_path: uploadData.path,
-                            description: mediaItem.description || `${mediaItem.type} file`
-                        })
-                        .select();
-
-                    if (dbError) {
-                        console.error('Database insert error:', dbError);
-                        throw new Error(`Database insert failed: ${dbError.message}`);
-                    }
-
-                    console.log('Media record saved to database:', dbData);
-
-                } catch (error) {
-                    console.error(`Error uploading ${mediaItem.name}:`, error);
-                    showNotification(`Failed to upload ${mediaItem.name}: ${error.message}`, 'error');
-                    
-                    // Continue with other files even if one fails
-                    continue;
-                }
-            }
-            
-            console.log(`Successfully uploaded ${uploadedCount} media files`);
-        }
-        
-        function showSuccessPage(submissions) {
-            const summary = document.getElementById('submissionSummary');
-            summary.innerHTML = `
-                <div>📝 Submissions created: ${submissions.length}</div>
-                <div>📸 Media files: ${uploadedMedia.length} uploaded</div>
-                <div>🏢 Branches: ${selectedBranches.map(b => b.name).join(', ')}</div>
-                <div>🏷️ Categories: ${selectedInstructionTypes.join(', ')}</div>
-            `;
-            
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('success').classList.add('active');
-            document.querySelector('.navigation').style.display = 'none';
-            
-            showNotification('Instructions submitted successfully!', 'success');
-        }
-        
-        function resetForm() {
-            currentStep = 1;
-            selectedClient = null;
-            selectedBranches = [];
-            selectedInstructionTypes = [];
-            uploadedMedia = [];
-            mediaCounter = 0;
-            
-            // Clear form inputs
-            document.getElementById('driverUsername').value = '';
-            document.getElementById('driverName').value = '';
-            document.getElementById('region').value = '';
-            document.getElementById('instructions').value = '';
-            document.getElementById('frequency').value = '';
-            document.getElementById('challenges').value = '';
-            
-            // Clear media gallery
-            document.getElementById('mediaGallery').innerHTML = '';
-            
-            // Reset selections
-            document.querySelectorAll('.client-card').forEach(card => card.classList.remove('selected'));
-            document.querySelectorAll('.branch-card').forEach(card => card.classList.remove('selected'));
-            document.querySelectorAll('.type-chip').forEach(chip => chip.classList.remove('selected'));
-            
-            showStep(1);
-            document.querySelector('.navigation').style.display = 'flex';
-        }
-        
-        // Instruction type selection
-        document.querySelectorAll('.type-chip').forEach(chip => {
-            chip.addEventListener('click', function() {
-                const type = this.dataset.type;
-                if (selectedInstructionTypes.includes(type)) {
-                    selectedInstructionTypes = selectedInstructionTypes.filter(t => t !== type);
-                    this.classList.remove('selected');
-                } else {
-                    selectedInstructionTypes.push(type);
-                    this.classList.add('selected');
-                }
             });
         });
-        
-        // Utility functions
-        function showLoading(text) {
-            document.getElementById('loadingText').textContent = text;
-            document.getElementById('loadingOverlay').classList.add('active');
-        }
-        
-        function hideLoading() {
-            document.getElementById('loadingOverlay').classList.remove('active');
-        }
-        
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
     </script>
 </body>
 </html>
