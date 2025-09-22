@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smartways Admin Portal - Delivery Instructions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .filters-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .data-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        th.sortable:hover {
+            background: #e9ecef;
+        }
+        
+        th .sort-icon {
+            margin-left: 5px;
+            font-size: 10px;
+            color: #999;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        td {
+            padding: 12px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .cell-truncate {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-primary {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .badge-success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .badge-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .action-icons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-icon {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+        }
+        
+        .action-icon:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .media-count {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .pagination {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #dee2e6;
+            background: #f8f9fa;
+        }
+        
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .page-btn {
+            padding: 5px 10px;
+            border: 1px solid #dee2e6;
+            background: white;
+            color: #666;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 800px;
+            max-height: 90vh;
+            width: 90%;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .modal-close {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: #333;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: calc(90vh - 140px);
+            overflow-y: auto;
+        }
+        
+        .detail-section {
+            margin-bottom: 25px;
+        }
+        
+        .detail-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .media-thumb {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .media-thumb:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .media-thumb img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-wrapper {
+                overflow-x: auto;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .detail-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <h1>🚚 Smartways Admin Portal</h1>
+                <p style="opacity: 0.9; margin-top: 5px;">Delivery Instructions Management System</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalInstructions">0</div>
+                    <div class="stat-label">Total Instructions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="activeDrivers">0</div>
+                    <div class="stat-label">Active Drivers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalLocations">0</div>
+                    <div class="stat-label">Locations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="filters-bar">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" id="searchInput" placeholder="Search by driver, location...">
+                </div>
+                <div class="filter-group">
+                    <label>Branch</label>
+                    <select id="branchFilter">
+                        <option value="">All Branches</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Driver</label>
+                    <select id="driverFilter">
+                        <option value="">All Drivers</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Region</label>
+                    <select id="regionFilter">
+                        <option value="">All Regions</option>
+                        <option value="NSW">New South Wales</option>
+                        <option value="VIC">Victoria</option>
+                        <option value="QLD">Queensland</option>
+                        <option value="WA">Western Australia</option>
+                        <option value="SA">South Australia</option>
+                        <option value="TAS">Tasmania</option>
+                        <option value="ACT">ACT</option>
+                        <option value="NT">Northern Territory</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <input type="date" id="dateFrom">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <input type="date" id="dateTo">
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    🔍 Apply Filters
+                </button>
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    ↺ Reset
+                </button>
+                <button class="btn btn-success" onclick="exportToCSV()">
+                    📊 Export to CSV
+                </button>
+                <button class="btn btn-success" onclick="exportToJSON()">
+                    📄 Export to JSON
+                </button>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    🔄 Refresh
+                </button>
+            </div>
+        </div>
+        
+        <div class="data-table-container">
+            <div class="table-header">
+                <div class="table-title">Delivery Instructions Database</div>
+                <div id="loadingIndicator" style="display: none;">
+                    <div class="loading"></div>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table id="instructionsTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortTable('created_at')">Date <span class="sort-icon">↕</span></th>
+                            <th class="sortable" onclick="sortTable('driver')">Driver <span class="sort-icon">↕</span></th>
+                            <th class="sortable" onclick="sortTable('branch')">Branch <span class="sort-icon">↕</span></th>
+                            <th>Pickup Location</th>
+                            <th>Delivery Location</th>
+                            <th class="sortable" onclick="sortTable('frequency')">Frequency <span class="sort-icon">↕</span></th>
+                            <th>Categories</th>
+                            <th>Media</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+                
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>No Instructions Found</h3>
+                    <p>No delivery instructions match your current filters.</p>
+                </div>
+            </div>
+            
+            <div class="pagination">
+                <div class="pagination-info">
+                    Showing <span id="showingFrom">1</span> to <span id="showingTo">10</span> of <span id="totalRecords">0</span> entries
+                </div>
+                <div class="pagination-controls">
+                    <button class="page-btn" onclick="previousPage()" id="prevBtn">Previous</button>
+                    <span id="pageNumbers"></span>
+                    <button class="page-btn" onclick="nextPage()" id="nextBtn">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detail View Modal -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Instruction Details</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Details will be populated here -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase - REPLACE WITH YOUR ACTUAL CREDENTIALS
+        const SUPABASE_URL = 'https://xfcsgkbdkijyrhrbgbph.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmY3Nna2Jka2lqeXJocmJnYnBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MDk3OTYsImV4cCI6MjA3NDA4NTc5Nn0.biT3BcsbVKQ7MIaJKqNcqRZoGqTMJCjdoA-VVCRa5UA';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Global variables
+        let allInstructions = [];
+        let filteredInstructions = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let sortColumn = 'created_at';
+        let sortDirection = 'desc';
+        
+        // Load data on page load
+        async function loadData() {
+            showLoading(true);
+            
+            try {
+                // Fetch all delivery instructions with related data
+                const { data: instructions, error } = await supabase
+                    .from('delivery_instructions')
+                    .select(`
+                        *,
+                        driver:drivers(*),
+                        branch:branches(*),
+                        pickup:pickup_locations(*),
+                        delivery:delivery_locations(*),
+                        media:media_uploads(*)
+                    `)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allInstructions = instructions || [];
+                filteredInstructions = [...allInstructions];
+                
+                // Update statistics
+                updateStatistics();
+                
+                // Populate filters
+                populateFilters();
+                
+                // Render table
+                renderTable();
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data. Please check your Supabase connection.');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+        
+        function updateStatistics() {
+            document.getElementById('totalInstructions').textContent = allInstructions.length;
+            
+            const uniqueDrivers = new Set(allInstructions.map(i => i.driver?.id).filter(Boolean));
+            document.getElementById('activeDrivers').textContent = uniqueDrivers.size;
+            
+            const uniqueLocations = new Set([
+                ...allInstructions.map(i => i.pickup?.id),
+                ...allInstructions.map(i => i.delivery?.id)
+            ].filter(Boolean));
+            document.getElementById('totalLocations').textContent = uniqueLocations.size;
+        }
+        
+        function populateFilters() {
+            // Populate branch filter
+            const branches = [...new Set(allInstructions.map(i => i.branch?.name).filter(Boolean))].sort();
+            const branchFilter = document.getElementById('branchFilter');
+            branchFilter.innerHTML = '<option value="">All Branches</option>';
+            branches.forEach(branch => {
+                branchFilter.innerHTML += `<option value="${branch}">${branch}</option>`;
+            });
+            
+            // Populate driver filter
+            const drivers = [...new Set(allInstructions.map(i => i.driver?.full_name).filter(Boolean))].sort();
+            const driverFilter = document.getElementById('driverFilter');
+            driverFilter.innerHTML = '<option value="">All Drivers</option>';
+            drivers.forEach(driver => {
+                driverFilter.innerHTML += `<option value="${driver}">${driver}</option>`;
+            });
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredInstructions.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredInstructions.slice(startIndex, endIndex);
+            
+            // Render rows
+            tbody.innerHTML = pageData.map(instruction => {
+                const date = new Date(instruction.created_at).toLocaleDateString();
+                const categories = instruction.instruction_types || [];
+                const mediaCount = instruction.media?.length || 0;
+                
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${instruction.driver?.full_name || 'N/A'}</td>
+                        <td class="cell-truncate" title="${instruction.branch?.name || 'N/A'}">${instruction.branch?.name || 'N/A'}</td>
+                        <td class="cell-truncate" title="${instruction.pickup?.name || 'N/A'}">${instruction.pickup?.name || 'N/A'}</td>
+                        <td class="cell-truncate" title="${instruction.delivery?.name || 'N/A'}">${instruction.delivery?.name || 'N/A'}</td>
+                        <td><span class="badge badge-primary">${instruction.delivery_frequency || 'N/A'}</span></td>
+                        <td>${categories.map(cat => `<span class="badge badge-warning">${cat}</span>`).join(' ')}</td>
+                        <td>${mediaCount > 0 ? `<span class="media-count">📎 ${mediaCount}</span>` : '-'}</td>
+                        <td>
+                            <div class="action-icons">
+                                <div class="action-icon" onclick="viewDetails('${instruction.id}')" title="View Details">👁️</div>
+                                <div class="action-icon" onclick="exportSingle('${instruction.id}')" title="Export">📥</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Update pagination
+            updatePagination();
+        }
+        
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredInstructions.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage + 1;
+            const endIndex = Math.min(currentPage * itemsPerPage, filteredInstructions.length);
+            
+            document.getElementById('showingFrom').textContent = filteredInstructions.length > 0 ? startIndex : 0;
+            document.getElementById('showingTo').textContent = endIndex;
+            document.getElementById('totalRecords').textContent = filteredInstructions.length;
+            
+            // Page numbers
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    const btn = document.createElement('button');
+                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                    btn.textContent = i;
+                    btn.onclick = () => goToPage(i);
+                    pageNumbers.appendChild(btn);
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    pageNumbers.innerHTML += '<span style="padding: 0 5px;">...</span>';
+                }
+            }
+            
+            // Enable/disable nav buttons
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+        }
+        
+        function goToPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+        
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+        
+        function nextPage() {
+            const totalPages = Math.ceil(filteredInstructions.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        }
+        
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const branch = document.getElementById('branchFilter').value;
+            const driver = document.getElementById('driverFilter').value;
+            const region = document.getElementById('regionFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            
+            filteredInstructions = allInstructions.filter(instruction => {
+                // Search filter
+                if (search && !(
+                    instruction.driver?.full_name?.toLowerCase().includes(search) ||
+                    instruction.branch?.name?.toLowerCase().includes(search) ||
+                    instruction.pickup?.name?.toLowerCase().includes(search) ||
+                    instruction.delivery?.name?.toLowerCase().includes(search)
+                )) {
+                    return false;
+                }
+                
+                // Branch filter
+                if (branch && instruction.branch?.name !== branch) {
+                    return false;
+                }
+                
+                // Driver filter
+                if (driver && instruction.driver?.full_name !== driver) {
+                    return false;
+                }
+                
+                // Region filter
+                if (region && instruction.driver?.region !== region) {
+                    return false;
+                }
+                
+                // Date filter
+                if (dateFrom || dateTo) {
+                    const instructionDate = new Date(instruction.created_at);
+                    if (dateFrom && instructionDate < new Date(dateFrom)) {
+                        return false;
+                    }
+                    if (dateTo && instructionDate > new Date(dateTo + 'T23:59:59')) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            currentPage = 1;
+            renderTable();
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('branchFilter').value = '';
+            document.getElementById('driverFilter').value = '';
+            document.getElementById('regionFilter').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            
+            filteredInstructions = [...allInstructions];
+            currentPage = 1;
+            renderTable();
+        }
+        
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            
+            filteredInstructions.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch (column) {
+                    case 'created_at':
+                        aVal = new Date(a.created_at);
+                        bVal = new Date(b.created_at);
+                        break;
+                    case 'driver':
+                        aVal = a.driver?.full_name || '';
+                        bVal = b.driver?.full_name || '';
+                        break;
+                    case 'branch':
+                        aVal = a.branch?.name || '';
+                        bVal = b.branch?.name || '';
+                        break;
+                    case 'frequency':
+                        aVal = a.delivery_frequency || '';
+                        bVal = b.delivery_frequency || '';
+                        break;
+                    default:
+                        return 0;
+                }
+                
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            renderTable();
+        }
+        
+        function viewDetails(instructionId) {
+            const instruction = allInstructions.find(i => i.id === instructionId);
+            if (!instruction) return;
+            
+            const modal = document.getElementById('detailModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = `
+                <div class="detail-section">
+                    <h3>Driver Information</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Name:</div>
+                        <div class="detail-value">${instruction.driver?.full_name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Username:</div>
+                        <div class="detail-value">${instruction.driver?.username || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Contact:</div>
+                        <div class="detail-value">${instruction.driver?.email || 'N/A'} | ${instruction.driver?.phone || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Region:</div>
+                        <div class="detail-value">${instruction.driver?.region || 'N/A'}</div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Location Details</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Branch:</div>
+                        <div class="detail-value">${instruction.branch?.name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Pickup:</div>
+                        <div class="detail-value">${instruction.pickup?.name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Delivery:</div>
+                        <div class="detail-value">${instruction.delivery?.name || 'N/A'}</div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Instructions</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Categories:</div>
+                        <div class="detail-value">${(instruction.instruction_types || []).join(', ') || 'None'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Access:</div>
+                        <div class="detail-value">${instruction.access_instructions || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Procedure:</div>
+                        <div class="detail-value">${instruction.written_instructions || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Contact Info:</div>
+                        <div class="detail-value">${instruction.contact_info || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Timing:</div>
+                        <div class="detail-value">${instruction.timing_requirements || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Special:</div>
+                        <div class="detail-value">${instruction.special_handling || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Frequency:</div>
+                        <div class="detail-value">${instruction.delivery_frequency || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Challenges:</div>
+                        <div class="detail-value">${instruction.challenges || 'N/A'}</div>
+                    </div>
+                </div>
+                
+                ${instruction.media && instruction.media.length > 0 ? `
+                    <div class="detail-section">
+                        <h3>Media Files (${instruction.media.length})</h3>
+                        <div class="media-grid">
+                            ${instruction.media.map(m => `
+                                <div class="media-thumb" onclick="window.open('${m.file_url}', '_blank')" title="${m.description || m.file_name}">
+                                    ${m.file_type === 'image' ? 
+                                        `<img src="${m.file_url}" alt="${m.file_name}">` :
+                                        `<div style="padding: 40px; text-align: center;">📄<br>${m.file_name}</div>`
+                                    }
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h3>Metadata</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value">${instruction.id}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Created:</div>
+                        <div class="detail-value">${new Date(instruction.created_at).toLocaleString()}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Updated:</div>
+                        <div class="detail-value">${new Date(instruction.updated_at).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+        
+        function exportSingle(instructionId) {
+            const instruction = allInstructions.find(i => i.id === instructionId);
+            if (!instruction) return;
+            
+            const dataStr = JSON.stringify(instruction, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `instruction_${instructionId}.json`;
+            link.click();
+        }
+        
+        function exportToCSV() {
+            const headers = [
+                'Date', 'Driver Name', 'Driver Username', 'Email', 'Phone', 'Region',
+                'Branch', 'Pickup Location', 'Delivery Location', 'Frequency',
+                'Categories', 'Access Instructions', 'Delivery Procedure', 'Contact Info',
+                'Timing', 'Special Handling', 'Challenges', 'Media Count'
+            ];
+            
+            const rows = filteredInstructions.map(i => [
+                new Date(i.created_at).toLocaleDateString(),
+                i.driver?.full_name || '',
+                i.driver?.username || '',
+                i.driver?.email || '',
+                i.driver?.phone || '',
+                i.driver?.region || '',
+                i.branch?.name || '',
+                i.pickup?.name || '',
+                i.delivery?.name || '',
+                i.delivery_frequency || '',
+                (i.instruction_types || []).join('; '),
+                i.access_instructions || '',
+                i.written_instructions || '',
+                i.contact_info || '',
+                i.timing_requirements || '',
+                i.special_handling || '',
+                i.challenges || '',
+                i.media?.length || 0
+            ]);
+            
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => 
+                    typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell
+                ).join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `delivery_instructions_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+        
+        function exportToJSON() {
+            const dataStr = JSON.stringify(filteredInstructions, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `delivery_instructions_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+        
+        function refreshData() {
+            loadData();
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // Set up real-time updates (optional)
+            supabase
+                .channel('delivery_instructions_changes')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'delivery_instructions' }, 
+                    payload => {
+                        console.log('Database change detected:', payload);
+                        loadData(); // Refresh data when changes occur
+                    }
+                )
+                .subscribe();
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
